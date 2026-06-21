@@ -1,0 +1,1790 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Patología Vascular — UVa</title>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --navy:#0A3A6B;--navy2:#0C447C;--navy3:#1565C0;
+  --red:#C0392B;--red2:#E53935;
+  --teal:#00695C;--teal2:#00897B;
+  --amber:#E65100;--amber2:#FF6D00;
+  --green2:#2E7D32;
+  --bg:#F7F9FC;--bg2:#EEF2F7;--bg3:#E3EAF0;
+  --white:#fff;--text:#0D1B2A;--text2:#3D5A80;--text3:#7A92A8;
+  --border:#D0DCE8;
+  --shadow:0 2px 12px rgba(10,58,107,.09);
+  --shadow2:0 8px 28px rgba(10,58,107,.16);
+  --r:14px;--r2:10px;--r3:7px;
+  --font:'Sora',sans-serif;--mono:'JetBrains Mono',monospace;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:100vh}
+::-webkit-scrollbar{width:4px;height:4px}
+::-webkit-scrollbar-thumb{background:var(--navy2);border-radius:2px}
+
+/* HERO */
+.hero{background:linear-gradient(135deg,var(--navy) 0%,var(--navy2) 60%,var(--navy3) 100%);
+  padding:26px 20px 20px;position:relative;overflow:hidden}
+.hero::before{content:"";position:absolute;right:-50px;top:-50px;width:240px;height:240px;
+  border-radius:50%;border:55px solid rgba(255,255,255,0.05)}
+.hero::after{content:"";position:absolute;right:70px;bottom:-70px;width:160px;height:160px;
+  border-radius:50%;border:35px solid rgba(255,255,255,0.04)}
+.hero-inner{display:flex;align-items:flex-start;gap:14px;position:relative;z-index:1}
+.hero-logo{width:56px;height:56px;border-radius:14px;background:rgba(255,255,255,.1);display:flex;align-items:center;justify-content:center;flex-shrink:0;border:1px solid rgba(255,255,255,.18);padding:6px}
+.hero-wm{font-size:22px;font-weight:800;color:#fff;letter-spacing:-.3px;margin-bottom:2px}
+.hero-sub{font-size:13.5px;color:rgba(255,255,255,.62);line-height:1.5}
+.hero-pills{display:flex;gap:5px;flex-wrap:wrap;margin-top:11px}
+.hp{font-size:11px;font-weight:600;padding:3px 10px;border-radius:20px;
+  background:rgba(255,255,255,.13);color:rgba(255,255,255,.9);border:1px solid rgba(255,255,255,.2)}
+
+/* NAV */
+.nav{background:var(--white);border-bottom:1.5px solid var(--border);
+  display:flex;overflow-x:auto;padding:0 6px;
+  position:sticky;top:0;z-index:200;box-shadow:0 2px 10px rgba(10,58,107,.07)}
+.nav::-webkit-scrollbar{height:0}
+.nb{display:flex;flex-direction:column;align-items:center;gap:4px;
+  padding:11px 15px 10px;border:none;background:transparent;cursor:pointer;
+  font-family:var(--font);font-size:14px;font-weight:500;color:var(--text3);
+  border-bottom:2.5px solid transparent;white-space:nowrap;transition:all .15s}
+.nb .ni{width:32px;height:32px;border-radius:8px;display:flex;align-items:center;
+  justify-content:center;background:var(--bg2);font-size:17px;transition:all .15s}
+.nb.on,.nb:hover{color:var(--navy2)}
+.nb.on{border-bottom-color:var(--navy2);font-weight:700}
+.nb.on .ni{background:#DBEAFE}
+
+/* BODY */
+.body{padding:18px 16px;max-width:980px;margin:0 auto}
+.sec{display:none}.sec.on{display:block}
+
+/* DASHBOARD */
+.reto-card{background:linear-gradient(135deg,var(--navy),var(--navy3));border-radius:var(--r);
+  padding:16px;color:#fff;display:flex;align-items:center;justify-content:space-between;
+  gap:12px;margin-bottom:16px;cursor:pointer;box-shadow:var(--shadow2)}
+.reto-card:hover{opacity:.95}
+.reto-title{font-size:13px;font-weight:700;margin-bottom:3px}
+.reto-sub{font-size:12px;opacity:.7}
+.reto-btn{padding:8px 16px;background:#fff;color:var(--navy);border-radius:var(--r3);
+  font-size:12px;font-weight:700;border:none;cursor:pointer;font-family:var(--font)}
+.dash-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px}
+.dc{background:var(--white);border:1px solid var(--border);border-radius:var(--r);
+  padding:14px;box-shadow:var(--shadow)}
+.dc.ab{border-top:3px solid var(--navy2)}.dc.ar{border-top:3px solid var(--red)}
+.dc.at{border-top:3px solid var(--teal2)}.dc.aa{border-top:3px solid var(--amber)}
+.dc-lbl{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;
+  color:var(--text3);margin-bottom:5px}
+.dc-val{font-size:24px;font-weight:800;color:var(--text);line-height:1}
+.dc-sub{font-size:11px;color:var(--text3);margin-top:2px}
+.sec-title{font-size:20px;font-weight:800;color:var(--text);margin-bottom:4px;letter-spacing:-.3px}
+.sec-sub{font-size:13px;color:var(--text2);margin-bottom:16px;line-height:1.5}
+.mod-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:9px}
+.mod-btn{background:var(--white);border:1.5px solid var(--border);border-radius:var(--r);
+  padding:14px 10px;cursor:pointer;transition:all .18s;text-align:center;box-shadow:var(--shadow)}
+.mod-btn:hover{border-color:var(--navy2);transform:translateY(-2px);box-shadow:var(--shadow2)}
+.mod-ico{font-size:22px;margin-bottom:7px}
+.mod-name{font-size:12px;font-weight:700;color:var(--text)}
+.mod-desc{font-size:11px;color:var(--text3);margin-top:2px}
+
+/* SIDEBAR LAYOUT */
+.layout2{display:grid;grid-template-columns:200px 1fr;gap:0;min-height:500px}
+.sb{border-right:1.5px solid var(--border);padding-top:4px;
+  overflow-y:auto;max-height:calc(100vh - 120px);position:sticky;top:120px}
+.sb-g{font-size:10px;font-weight:800;color:var(--text3);letter-spacing:.1em;
+  padding:10px 12px 4px;text-transform:uppercase}
+.sbi{display:flex;align-items:center;gap:8px;padding:7px 12px;cursor:pointer;
+  font-size:14.5px;color:var(--text2);border-left:3px solid transparent;transition:all .12s}
+.sbi:hover{background:#F0F4FF;color:var(--text)}
+.sbi.on{background:#EFF6FF;color:var(--navy2);border-left-color:var(--navy2);font-weight:700}
+.sbn{width:22px;height:22px;border-radius:5px;font-size:10px;font-weight:700;
+  display:flex;align-items:center;justify-content:center;flex-shrink:0;
+  background:var(--bg2);color:var(--text3)}
+.sbi.on .sbn{background:#BFDBFE;color:var(--navy)}
+.main-panel{padding:0 0 20px 18px;overflow-y:auto}
+.topic-head{border-left:4px solid var(--navy2);padding:10px 0 10px 14px;margin-bottom:16px}
+.topic-head h2{font-size:19px;font-weight:800;color:var(--text);margin-bottom:2px;letter-spacing:-.3px}
+.topic-head p{font-size:12.5px;color:var(--text2)}
+.tcard{background:var(--white);border:1px solid var(--border);border-radius:var(--r);
+  overflow:hidden;margin-bottom:10px;box-shadow:var(--shadow)}
+.tcard-hdr{display:flex;align-items:center;gap:9px;padding:10px 14px;
+  background:var(--bg2);border-bottom:1px solid var(--border)}
+.tcard-dot{width:8px;height:8px;border-radius:50%;background:var(--navy2);flex-shrink:0}
+.tcard-hdr h3{font-size:15px;font-weight:700;color:var(--text)}
+.tcard-body{padding:12px 14px}
+.tcard-body p,.tcard-body li{font-size:15px;color:var(--text2);line-height:1.8}
+.tcard-body ul{padding-left:16px}
+.tcard-body table{width:100%;border-collapse:collapse;font-size:12px;margin-top:8px}
+.tcard-body th{background:#DBEAFE;padding:6px;border:1px solid #BFDBFE;text-align:left;font-weight:700}
+.tcard-body td{padding:6px;border:1px solid var(--border)}
+.tags{display:flex;gap:5px;flex-wrap:wrap;margin-top:10px}
+.tag{font-size:11px;padding:2px 9px;border-radius:10px;font-weight:700}
+.t-b{background:#DBEAFE;color:#1E3A5F}.t-r{background:#FEE2E2;color:#7F1D1D}
+.t-g{background:#DCFCE7;color:#14532D}.t-a{background:#FEF3C7;color:#78350F}
+.t-p{background:#EDE9FE;color:#3730A3}
+.mir-pearl{background:linear-gradient(135deg,#FEF3C7,#FFFBEB);border:1.5px solid var(--amber2);
+  border-radius:var(--r2);padding:12px 14px;margin:12px 0;display:flex;gap:9px}
+.mir-pearl-icon{font-size:18px;flex-shrink:0}
+.mir-pearl-title{font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.08em;
+  color:var(--amber);margin-bottom:3px}
+.mir-pearl-text{font-size:14px;color:var(--text);line-height:1.65}
+.algo-box{background:linear-gradient(135deg,#EFF6FF,#DBEAFE);border:1.5px solid var(--navy2);
+  border-radius:var(--r2);padding:14px;margin:12px 0}
+.algo-title{font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.08em;
+  color:var(--navy);margin-bottom:10px}
+.algo-step{display:flex;align-items:flex-start;gap:9px;padding:6px 0;
+  border-bottom:1px dashed rgba(12,68,124,.15)}
+.algo-step:last-child{border-bottom:none}
+.algo-num{width:22px;height:22px;border-radius:50%;background:var(--navy2);color:#fff;
+  font-size:10px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.algo-step-text{font-size:14px;color:var(--text);line-height:1.6}
+
+/* SLIDES */
+.sgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(155px,1fr));gap:10px}
+.sc{background:var(--white);border:1.5px solid var(--border);border-radius:var(--r);
+  overflow:hidden;cursor:pointer;transition:all .2s;box-shadow:var(--shadow)}
+.sc:hover{border-color:var(--navy2);transform:translateY(-3px);box-shadow:var(--shadow2)}
+.sthumb{height:100px;overflow:hidden;position:relative;background:var(--bg2);
+  display:flex;align-items:center;justify-content:center}
+.sthumb img{width:100%;height:100%;object-fit:cover;position:absolute;inset:0}
+.sthumb-placeholder{display:flex;flex-direction:column;align-items:center;gap:5px;z-index:1}
+.stnum{position:absolute;top:6px;left:6px;font-size:10px;font-weight:800;padding:2px 7px;
+  border-radius:5px;background:rgba(255,255,255,.92);color:var(--text);z-index:2}
+.stag{position:absolute;bottom:6px;right:6px;font-size:10px;font-weight:700;
+  padding:2px 7px;border-radius:5px;z-index:2}
+.slabel{padding:8px 10px;border-top:1px solid var(--border)}
+.slabel p{font-size:12px;font-weight:700;color:var(--text);margin-bottom:1px}
+.slabel span{font-size:11px;color:var(--text3)}
+
+/* VIEWER MODAL */
+.modal{display:none;position:fixed;inset:0;background:rgba(5,15,35,.93);z-index:1000;
+  flex-direction:column;backdrop-filter:blur(5px)}
+.modal.open{display:flex}
+.modal-bar{width:100%;background:#0D1F38;padding:10px 16px;
+  display:flex;align-items:center;justify-content:space-between;flex-shrink:0;
+  border-bottom:1px solid rgba(255,255,255,.1)}
+.modal-title{font-size:13.5px;font-weight:700;color:#fff}
+.modal-nav{display:flex;align-items:center;gap:7px}
+.mcnt{font-size:11px;color:rgba(255,255,255,.5);font-family:var(--mono)}
+.mbtn{background:rgba(255,255,255,.11);border:1px solid rgba(255,255,255,.18);color:#fff;
+  font-size:12.5px;padding:5px 13px;border-radius:var(--r3);cursor:pointer;
+  font-family:var(--font);font-weight:600;transition:all .12s}
+.mbtn:hover{background:rgba(255,255,255,.22)}
+.mbtn.red{background:rgba(192,57,43,.35);border-color:var(--red2)}
+.modal-body{flex:1;display:flex;align-items:center;justify-content:center;padding:14px;overflow:auto}
+.modal-img{max-width:100%;max-height:calc(100vh - 100px);border-radius:8px;object-fit:contain}
+.modal-loading{color:rgba(255,255,255,.6);font-size:14px;text-align:center}
+.vstrip{display:flex;gap:5px;padding:6px 14px;background:#0D1F38;overflow-x:auto;
+  flex-shrink:0;border-top:1px solid rgba(255,255,255,.07)}
+.vstrip::-webkit-scrollbar{height:3px}
+.vpill{padding:4px 9px;border-radius:5px;font-size:10px;font-weight:700;cursor:pointer;
+  background:rgba(255,255,255,.09);color:rgba(255,255,255,.5);border:1.5px solid transparent;
+  transition:all .12s;flex-shrink:0;font-family:var(--mono)}
+.vpill.on{background:rgba(255,255,255,.22);color:#fff;border-color:rgba(255,255,255,.4)}
+
+/* INFOGRAFÍAS */
+.igrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:12px}
+.ic{background:var(--white);border:1.5px solid var(--border);border-radius:var(--r);
+  padding:14px;cursor:pointer;transition:all .18s;box-shadow:var(--shadow)}
+.ic:hover{border-color:var(--navy2);transform:translateY(-2px);box-shadow:var(--shadow2)}
+.ic-top{display:flex;align-items:center;gap:9px;margin-bottom:6px}
+.ic-ico{width:36px;height:36px;border-radius:9px;display:flex;align-items:center;
+  justify-content:center;font-size:19px;flex-shrink:0}
+.ic h4{font-size:13px;font-weight:700;color:var(--text);line-height:1.3}
+.ic p{font-size:12px;color:var(--text3);line-height:1.5;margin-bottom:7px}
+.ic-arr{font-size:12px;color:var(--navy2);font-weight:700}
+.ic-viewer{display:none;margin-top:11px;border-radius:var(--r2);overflow:hidden;
+  border:1px solid var(--border);background:var(--bg2)}
+.ic-viewer.open{display:block}
+.ic.expanded{grid-column:1/-1}
+.ic-viewer img{width:100%;display:block;border-radius:8px;max-height:none}
+.ic-viewer img{width:100%;display:block}
+.ic-viewer .loading-msg{padding:16px;text-align:center;font-size:13px;color:var(--text3)}
+
+/* TEST MIR */
+.quiz-wrap{max-width:640px}
+.quiz-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;flex-wrap:wrap;gap:7px}
+.quiz-hdr h2{font-size:17px;font-weight:800;color:var(--text);letter-spacing:-.3px}
+.score-pill{font-size:12px;font-weight:700;padding:4px 13px;border-radius:20px;
+  background:#DBEAFE;color:var(--navy);border:1px solid #BFDBFE}
+.frow{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px}
+.fchip{padding:5px 12px;border-radius:20px;font-size:12px;font-weight:600;cursor:pointer;
+  border:1.5px solid var(--border);background:var(--white);color:var(--text2);
+  font-family:var(--font);transition:all .12s}
+.fchip.on{background:var(--navy2);color:#fff;border-color:var(--navy2)}
+.pbar-w{height:4px;background:var(--bg3);border-radius:2px;margin-bottom:16px;overflow:hidden}
+.pbar{height:100%;background:var(--navy2);border-radius:2px;transition:width .4s}
+.qcard{background:var(--white);border:1.5px solid var(--border);border-radius:var(--r);
+  padding:20px;box-shadow:var(--shadow)}
+.qtop{display:flex;align-items:center;gap:7px;margin-bottom:12px;flex-wrap:wrap}
+.qnum{font-size:11px;font-weight:800;padding:3px 11px;border-radius:20px;
+  background:#DBEAFE;color:var(--navy)}
+.qlvl{font-size:11px;color:#F59E0B}
+.qtag{font-size:11.5px;color:var(--text3);font-weight:500}
+.qtext{font-size:16px;font-weight:600;color:var(--text);line-height:1.65;margin-bottom:16px}
+.opts{display:flex;flex-direction:column;gap:8px}
+.opt{padding:12px 15px;border-radius:var(--r2);border:1.5px solid var(--border);
+  background:var(--white);text-align:left;font-size:15px;cursor:pointer;
+  color:var(--text);font-family:var(--font);display:flex;align-items:flex-start;
+  gap:9px;transition:all .12s;line-height:1.45}
+.opt:hover:not(:disabled){background:#EFF6FF;border-color:var(--navy2)}
+.opt-l{width:24px;height:24px;border-radius:50%;background:var(--bg2);
+  display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;
+  flex-shrink:0;margin-top:1px;color:var(--text3);font-family:var(--mono)}
+.opt.ok{background:#F0FDF4;border-color:#16A34A;color:#14532D}
+.opt.ok .opt-l{background:#BBF7D0;color:#14532D}
+.opt.bad{background:#FEF2F2;border-color:#DC2626;color:#7F1D1D}
+.opt.bad .opt-l{background:#FECACA;color:#7F1D1D}
+.opt:disabled{cursor:default}
+.fb{margin-top:14px;padding:13px 15px;border-radius:var(--r2);font-size:13px;
+  line-height:1.65;display:flex;gap:9px;align-items:flex-start;animation:fadeIn .3s}
+.fb-ok{background:#F0FDF4;color:#14532D;border-left:4px solid #16A34A}
+.fb-bad{background:#FEF2F2;color:#7F1D1D;border-left:4px solid #DC2626}
+.fi{font-size:18px;flex-shrink:0}
+.qnav{display:flex;align-items:center;justify-content:space-between;margin-top:16px}
+.qnbtn{padding:9px 18px;border-radius:var(--r2);font-size:13px;font-weight:700;cursor:pointer;
+  border:1.5px solid var(--border);background:var(--white);color:var(--text);
+  font-family:var(--font);transition:all .12s}
+.qnbtn:hover{background:#EFF6FF;border-color:var(--navy2)}
+.qnbtn:disabled{opacity:.35;cursor:default}
+
+/* CASOS */
+.casos-banner{display:flex;align-items:flex-start;gap:12px;padding:14px 16px;
+  background:#EFF6FF;border-radius:var(--r);margin-bottom:18px;border-left:4px solid var(--navy2)}
+.casos-banner p{font-size:13.5px;color:var(--navy);line-height:1.6;font-weight:500}
+.caso{background:var(--white);border:1.5px solid var(--border);border-radius:var(--r);
+  overflow:hidden;margin-bottom:11px;transition:all .15s;box-shadow:var(--shadow)}
+.caso.open{border-color:var(--navy2)}
+.caso-hdr{display:flex;align-items:center;gap:11px;padding:14px 16px;cursor:pointer}
+.caso-circle{width:40px;height:40px;border-radius:50%;display:flex;align-items:center;
+  justify-content:center;font-size:20px;flex-shrink:0}
+.caso-info{flex:1}
+.caso-title{font-size:15.5px;font-weight:700;color:var(--text)}
+.caso-sub{font-size:11.5px;color:var(--text3);margin-top:1px}
+.caso-chips{display:flex;gap:4px}
+.cchip{font-size:10.5px;padding:2px 9px;border-radius:20px;font-weight:700;white-space:nowrap}
+.caso-chev{font-size:11px;color:var(--text3);transition:transform .2s;flex-shrink:0}
+.caso.open .caso-chev{transform:rotate(180deg)}
+.caso-body{display:none;padding:0 16px 16px;border-top:1px solid var(--border)}
+.caso.open .caso-body{display:block;animation:fadeIn .22s}
+.cs{margin-top:13px}
+.csl{font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.08em;
+  color:var(--text3);margin-bottom:6px;display:flex;align-items:center;gap:6px}
+.csl-dot{width:6px;height:6px;border-radius:50%;background:var(--navy2);flex-shrink:0}
+.caso-body p,.caso-body li{font-size:15px;color:var(--text2);line-height:1.8}
+.caso-body ul{padding-left:16px}
+.cq{margin-top:12px;padding:12px 14px;border-radius:var(--r2);background:#EFF6FF;
+  border-left:4px solid var(--navy2);font-size:13.5px;color:var(--navy);
+  font-weight:600;line-height:1.55}
+.dopts{display:flex;flex-direction:column;gap:7px;margin-top:11px}
+.dopt{padding:10px 13px;border-radius:var(--r2);border:1.5px solid var(--border);
+  background:var(--white);cursor:pointer;font-size:13px;color:var(--text);
+  font-family:var(--font);display:flex;gap:8px;align-items:flex-start;
+  transition:all .12s;line-height:1.4;text-align:left;width:100%}
+.dopt:hover:not(:disabled){background:#EFF6FF;border-color:var(--navy2)}
+.dopt.dok{background:#F0FDF4;border-color:#16A34A;color:#14532D}
+.dopt.dbad{background:#FEF2F2;border-color:#DC2626;color:#7F1D1D}
+.dopt:disabled{cursor:default}
+.dopt-l{width:22px;height:22px;border-radius:50%;background:var(--bg2);
+  display:flex;align-items:center;justify-content:center;font-size:10px;
+  font-weight:800;flex-shrink:0;font-family:var(--mono);color:var(--text3)}
+.dopt.dok .dopt-l{background:#BBF7D0;color:#14532D}
+.dopt.dbad .dopt-l{background:#FECACA;color:#7F1D1D}
+.dfb{margin-top:10px;padding:11px 13px;border-radius:var(--r2);font-size:13px;
+  line-height:1.65;animation:fadeIn .3s}
+.dfb.ok{background:#F0FDF4;color:#14532D;border-left:3px solid #16A34A}
+.dfb.bad{background:#FEF2F2;color:#7F1D1D;border-left:3px solid #DC2626}
+.next-btn{margin-top:10px;padding:8px 16px;border-radius:var(--r2);background:var(--navy2);
+  color:#fff;border:none;cursor:pointer;font-size:12.5px;font-weight:700;
+  font-family:var(--font);transition:all .15s}
+.next-btn:hover{background:var(--navy)}
+.dx-box{margin-top:12px;padding:13px 15px;border-radius:var(--r2);
+  background:#F0FDF4;border-left:4px solid #16A34A}
+.dx-box p{font-size:13.5px;color:#14532D;line-height:1.75}
+
+/* REPASO */
+.rtabs{display:flex;gap:6px;margin-bottom:18px;flex-wrap:wrap}
+.rtab{padding:6px 14px;border-radius:20px;font-size:12.5px;font-weight:600;cursor:pointer;
+  border:1.5px solid var(--border);background:var(--white);color:var(--text2);
+  font-family:var(--font);transition:all .12s}
+.rtab.on{background:var(--navy2);color:#fff;border-color:var(--navy2)}
+.flash-wrap{max-width:480px;margin:0 auto}
+.flash-card{background:var(--white);border:1.5px solid var(--border);border-radius:var(--r);
+  padding:28px 22px;text-align:center;cursor:pointer;box-shadow:var(--shadow2);
+  min-height:200px;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.flash-q{font-size:17px;font-weight:700;color:var(--text);line-height:1.55;margin-bottom:14px}
+.flash-hint{font-size:12px;color:var(--text3)}
+.flash-a{display:none;font-size:15.5px;color:var(--text);line-height:1.7;font-weight:500}
+.flash-card.flip .flash-a{display:block;animation:fadeIn .3s}
+.flash-card.flip .flash-hint{display:none}
+.flash-card.flip .flash-q{color:var(--navy2);font-size:13px;margin-bottom:10px}
+.flash-nav{display:flex;align-items:center;justify-content:space-between;margin-top:12px}
+.fnbtn{padding:7px 16px;border-radius:var(--r2);border:1.5px solid var(--border);
+  background:var(--white);color:var(--text);font-size:12.5px;font-weight:600;
+  cursor:pointer;font-family:var(--font);transition:all .12s}
+.fnbtn:hover{background:#EFF6FF;border-color:var(--navy2)}
+.fnbtn:disabled{opacity:.35;cursor:default}
+.fcnt{font-size:11px;color:var(--text3);font-family:var(--mono)}
+.perla-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:9px}
+.perla-card{background:var(--white);border:1.5px solid var(--amber2);border-radius:var(--r2);padding:13px}
+.perla-ico{font-size:18px;margin-bottom:6px}
+.perla-txt{font-size:14.5px;color:var(--text);line-height:1.65;font-weight:500}
+.err-grid{display:flex;flex-direction:column;gap:9px}
+.err-card{background:var(--white);border-radius:var(--r2);overflow:hidden;border:1.5px solid var(--border)}
+.err-cols{display:grid;grid-template-columns:1fr 1fr}
+.err-col{padding:11px 13px}
+.err-col.w{background:#FEF2F2;border-right:1px solid #FECACA}
+.err-col.r{background:#F0FDF4}
+.err-lbl{font-size:9.5px;font-weight:800;text-transform:uppercase;letter-spacing:.08em;margin-bottom:4px}
+.err-col.w .err-lbl{color:#DC2626}.err-col.r .err-lbl{color:#16A34A}
+.err-txt{font-size:12.5px;line-height:1.5}
+.err-col.w .err-txt{color:#7F1D1D}.err-col.r .err-txt{color:#14532D}
+.err-explain{padding:9px 13px;font-size:12px;color:var(--text2);background:var(--bg2);line-height:1.5}
+
+/* PROGRESO */
+.prog-grid{display:grid;grid-template-columns:1fr 1fr;gap:11px;margin-bottom:16px}
+.prog-card{background:var(--white);border:1px solid var(--border);border-radius:var(--r);padding:14px}
+.radar-row{display:flex;align-items:center;gap:9px;margin-bottom:8px}
+.radar-lbl{font-size:11.5px;font-weight:600;color:var(--text2);width:125px;flex-shrink:0}
+.radar-bw{flex:1;height:7px;background:var(--bg3);border-radius:3px;overflow:hidden}
+.radar-b{height:100%;border-radius:3px;transition:width .8s}
+.radar-pct{font-size:10.5px;font-weight:700;color:var(--text2);width:32px;text-align:right;font-family:var(--mono)}
+.rec-card{background:linear-gradient(135deg,#FEF3C7,#FFFBEB);border:1.5px solid var(--amber2);
+  border-radius:var(--r);padding:14px;margin-bottom:14px}
+.rec-title{font-size:10.5px;font-weight:800;text-transform:uppercase;letter-spacing:.08em;
+  color:var(--amber);margin-bottom:6px}
+.rec-txt{font-size:13.5px;color:var(--text);line-height:1.6}
+.fallos-list{display:flex;flex-direction:column;gap:7px}
+.fallo{display:flex;align-items:center;gap:10px;background:var(--white);
+  border:1px solid var(--border);border-radius:var(--r2);padding:10px 12px}
+.fallo-rank{width:26px;height:26px;border-radius:50%;background:#FEE2E2;
+  color:var(--red);font-size:11px;font-weight:800;display:flex;align-items:center;
+  justify-content:center;flex-shrink:0;font-family:var(--mono)}
+.fallo-concept{flex:1;font-size:12.5px;font-weight:600;color:var(--text)}
+.fallo-pct{font-size:12.5px;font-weight:700;color:var(--red);font-family:var(--mono)}
+
+@keyframes fadeIn{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:none}}
+@media(max-width:600px){
+  .layout2{grid-template-columns:1fr}.sb{display:none}.main-panel{padding:0}
+  .dash-grid,.prog-grid{grid-template-columns:1fr}
+  .err-cols{grid-template-columns:1fr}.err-col.w{border-right:none;border-bottom:1px solid #FECACA}
+}
+</style>
+</head>
+<body>
+
+<div class="hero">
+  <div class="hero-inner">
+    <div class="hero-logo"><svg width="100%" viewBox="0 0 56 70" xmlns="http://www.w3.org/2000/svg" fill="none">
+  <defs>
+    <linearGradient id="aorta-glow" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#C62828"/>
+      <stop offset="35%" stop-color="#FF5722"/>
+      <stop offset="50%" stop-color="#FFAB40"/>
+      <stop offset="65%" stop-color="#FF5722"/>
+      <stop offset="100%" stop-color="#C62828"/>
+    </linearGradient>
+    <linearGradient id="vein-b" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#1565C0" stop-opacity="0.8"/>
+      <stop offset="100%" stop-color="#0D47A1" stop-opacity="0.5"/>
+    </linearGradient>
+  </defs>
+  <path d="M18,12 C14,18 12,26 13,34 C14,42 18,48 20,56" stroke="url(#vein-b)" stroke-width="3.5" stroke-linecap="round"/>
+  <path d="M38,10 C42,16 44,24 43,32 C42,40 38,46 36,54" stroke="url(#vein-b)" stroke-width="2.5" stroke-linecap="round"/>
+  <path d="M29,18 C24,15 19,14 14,16" stroke="#E53935" stroke-width="2.5" stroke-linecap="round" opacity="0.9"/>
+  <path d="M29,24 C34,21 39,20 43,22" stroke="#E53935" stroke-width="2.2" stroke-linecap="round" opacity="0.9"/>
+  <path d="M29,30 C22,28 17,30 12,28" stroke="#E53935" stroke-width="2" stroke-linecap="round" opacity="0.8"/>
+  <path d="M29,36 C36,34 41,36 46,34" stroke="#E53935" stroke-width="2" stroke-linecap="round" opacity="0.8"/>
+  <path d="M30,8 C32,4 38,2 42,6" stroke="#EF5350" stroke-width="3" stroke-linecap="round"/>
+  <path d="M30,10 C34,6 40,6 44,10" stroke="#EF5350" stroke-width="2.5" stroke-linecap="round"/>
+  <path d="M30,12 C36,9 42,11 44,16" stroke="#EF5350" stroke-width="2.5" stroke-linecap="round"/>
+  <path d="M27,60 C22,64 16,66 10,66" stroke="#E53935" stroke-width="3.5" stroke-linecap="round"/>
+  <path d="M29,60 C34,64 40,66 46,66" stroke="#E53935" stroke-width="3.5" stroke-linecap="round"/>
+  <path d="M29,6 C29,6 28,14 28,24 C28,36 28,48 28,60" stroke="#B71C1C" stroke-width="10" stroke-linecap="round"/>
+  <path d="M28,10 C28,4 34,1 38,5 C42,9 40,17 36,20 C33,22 30,22 28,22" stroke="#B71C1C" stroke-width="10" stroke-linecap="round"/>
+  <path d="M29,6 C29,6 28,14 28,24 C28,36 28,48 28,60" stroke="#E53935" stroke-width="7" stroke-linecap="round"/>
+  <path d="M28,10 C28,4 34,1 38,5 C42,9 40,17 36,20 C33,22 30,22 28,22" stroke="#E53935" stroke-width="7" stroke-linecap="round"/>
+  <path d="M28.5,8 C28.5,14 28,24 28,36 C28,46 28,58 28,60" stroke="url(#aorta-glow)" stroke-width="3.5" stroke-linecap="round"/>
+  <path d="M28,10 C28,5 33,2 37,6 C40,10 39,17 35,20 C32,22 30,22 28,22" stroke="url(#aorta-glow)" stroke-width="3.5" stroke-linecap="round"/>
+</svg></div>
+    <div>
+      <div class="hero-wm">PATOLOGÍA VASCULAR</div>
+      <div class="hero-sub">Angiología y Cirugía Vascular · Universidad de Valladolid<br>Prof. Mª Lourdes del Río Solá</div>
+      <div class="hero-pills">
+        <span class="hp">11 temas</span><span class="hp">4 seminarios</span>
+        <span class="hp">Casos interactivos</span><span class="hp">Test MIR</span>
+        <span class="hp">Repaso rápido</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<nav class="nav">
+  <button class="nb on" onclick="goSec('inicio',this)"><span class="ni">🏠</span>Inicio</button>
+  <button class="nb" onclick="goSec('teoria',this)"><span class="ni">📖</span>Teoría</button>
+  <button class="nb" onclick="goSec('slides',this)"><span class="ni">🖼</span>Diapositivas</button>
+  <button class="nb" onclick="goSec('info',this)"><span class="ni">📊</span>Infografías</button>
+  <button class="nb" onclick="goSec('casos',this)"><span class="ni">🏥</span>Casos</button>
+  <button class="nb" onclick="goSec('test',this)"><span class="ni">✏️</span>Test MIR</button>
+  <button class="nb" onclick="goSec('repaso',this)"><span class="ni">⚡</span>Repaso</button>
+  <button class="nb" onclick="goSec('progreso',this)"><span class="ni">📈</span>Progreso</button>
+</nav>
+
+<!-- MODAL VISOR DIAPOSITIVAS -->
+<div class="modal" id="viewer">
+  <div class="modal-bar">
+    <span class="modal-title" id="vtitle"></span>
+    <div class="modal-nav">
+      <span class="mcnt" id="vcnt"></span>
+      <button class="mbtn" onclick="sMove(-1)">&#8592; Ant</button>
+      <button class="mbtn" onclick="sMove(1)">Sig &#8594;</button>
+      <button class="mbtn red" onclick="closeV()">✕ Cerrar</button>
+    </div>
+  </div>
+  <div class="modal-body" id="vbody">
+    <div class="modal-loading">Cargando...</div>
+  </div>
+  <div class="vstrip" id="vstrip"></div>
+</div>
+
+<div class="body">
+
+<!-- INICIO -->
+<div id="inicio" class="sec on">
+  <div class="reto-card" onclick="goSec('casos',document.querySelectorAll('.nb')[4])">
+    <div>
+      <div class="reto-title">🎯 Reto del día — Caso clínico</div>
+      <div class="reto-sub">Isquemia aguda · Nivel básico · 5 min estimados</div>
+    </div>
+    <button class="reto-btn">Comenzar →</button>
+  </div>
+  <div class="dash-grid">
+    <div class="dc ab"><div class="dc-lbl">Preguntas respondidas</div>
+      <div class="dc-val" id="d-total">0</div><div class="dc-sub">en el test MIR</div></div>
+    <div class="dc at"><div class="dc-lbl">% Acierto global</div>
+      <div class="dc-val" id="d-pct">—</div><div class="dc-sub">sobre respondidas</div></div>
+    <div class="dc ar"><div class="dc-lbl">Tema más débil</div>
+      <div class="dc-val" style="font-size:14px;margin-top:4px" id="d-weak">—</div><div class="dc-sub">según historial</div></div>
+    <div class="dc aa"><div class="dc-lbl">Racha de estudio</div>
+      <div class="dc-val" id="d-streak">1</div><div class="dc-sub">días consecutivos 🔥</div></div>
+  </div>
+  <div class="sec-title">Módulos</div>
+  <div class="sec-sub">Accede a cualquier sección en un toque</div>
+  <div class="mod-grid">
+    <div class="mod-btn" onclick="goSec('teoria',document.querySelectorAll('.nb')[1])">
+      <div class="mod-ico">📖</div><div class="mod-name">Teoría</div><div class="mod-desc">11 temas · 4 seminarios</div></div>
+    <div class="mod-btn" onclick="goSec('slides',document.querySelectorAll('.nb')[2])">
+      <div class="mod-ico">🖼</div><div class="mod-name">Diapositivas</div><div class="mod-desc">15 presentaciones</div></div>
+    <div class="mod-btn" onclick="goSec('info',document.querySelectorAll('.nb')[3])">
+      <div class="mod-ico">📊</div><div class="mod-name">Infografías</div><div class="mod-desc">Esquemas visuales</div></div>
+    <div class="mod-btn" onclick="goSec('casos',document.querySelectorAll('.nb')[4])">
+      <div class="mod-ico">🏥</div><div class="mod-name">Casos clínicos</div><div class="mod-desc">Decisión interactiva</div></div>
+    <div class="mod-btn" onclick="goSec('test',document.querySelectorAll('.nb')[5])">
+      <div class="mod-ico">✏️</div><div class="mod-name">Test MIR</div><div class="mod-desc">Banco de preguntas</div></div>
+    <div class="mod-btn" onclick="goSec('repaso',document.querySelectorAll('.nb')[6])">
+      <div class="mod-ico">⚡</div><div class="mod-name">Repaso rápido</div><div class="mod-desc">Flashcards · Perlas</div></div>
+  </div>
+</div>
+
+<!-- TEORÍA -->
+<div id="teoria" class="sec">
+  <div class="layout2">
+    <div class="sb">
+      <div class="sb-g">Temas</div>
+      <div class="sbi on" onclick="selT(this,'t1')"><span class="sbn">1</span>Generalidades</div>
+      <div class="sbi" onclick="selT(this,'t2')"><span class="sbn">2</span>Isquemia aguda</div>
+      <div class="sbi" onclick="selT(this,'t3')"><span class="sbn">3</span>Troncos supraaórticos</div>
+      <div class="sbi" onclick="selT(this,'t4')"><span class="sbn">4</span>Isquemia crónica EEII</div>
+      <div class="sbi" onclick="selT(this,'t5')"><span class="sbn">5</span>Insuf. venosa crónica</div>
+      <div class="sbi" onclick="selT(this,'t6')"><span class="sbn">6</span>Enf. tromboembólica</div>
+      <div class="sbi" onclick="selT(this,'t7')"><span class="sbn">7</span>Linfáticos / pie DM</div>
+      <div class="sbi" onclick="selT(this,'t8')"><span class="sbn">8</span>Patología aorta</div>
+      <div class="sbi" onclick="selT(this,'t9')"><span class="sbn">9</span>Traumatismos vasc.</div>
+      <div class="sbi" onclick="selT(this,'t10')"><span class="sbn">10</span>Angiodisplasias</div>
+      <div class="sbi" onclick="selT(this,'t11')"><span class="sbn">11</span>Arterias viscerales</div>
+      <div class="sb-g">Seminarios</div>
+      <div class="sbi" onclick="selT(this,'s1')"><span class="sbn">S1</span>Exploración vascular</div>
+      <div class="sbi" onclick="selT(this,'s2')"><span class="sbn">S2</span>Diagnóstico edema</div>
+      <div class="sbi" onclick="selT(this,'s3')"><span class="sbn">S3</span>Úlceras EEII</div>
+      <div class="sbi" onclick="selT(this,'s4')"><span class="sbn">S4</span>Casos clínicos</div>
+    </div>
+    <div class="main-panel" id="tp"></div>
+  </div>
+</div>
+
+<!-- DIAPOSITIVAS -->
+<div id="slides" class="sec">
+  <div class="sec-title">Diapositivas de clase</div>
+  <div class="sec-sub">Haz clic en una presentación para abrirla en el visor. Navega con ← → o con el teclado.</div>
+  <div class="sgrid" id="sgrid"></div>
+</div>
+
+<!-- INFOGRAFÍAS -->
+<div id="info" class="sec">
+  <div class="sec-title">Infografías y esquemas visuales</div>
+  <div class="sec-sub">Haz clic en una tarjeta para desplegar la imagen del material docente.</div>
+  <div class="igrid" id="igrid"></div>
+</div>
+
+<!-- CASOS -->
+<div id="casos" class="sec">
+  <div class="casos-banner">
+    <span style="font-size:28px">🏥</span>
+    <p>Casos clínicos reales del HCU Valladolid. Toma decisiones en cada fase y recibe feedback razonado inmediato.</p>
+  </div>
+  <div id="clist"></div>
+</div>
+
+<!-- TEST MIR -->
+<div id="test" class="sec">
+  <div class="quiz-wrap">
+    <div class="quiz-hdr">
+      <h2>Test MIR — Patología Vascular</h2>
+      <span class="score-pill" id="scb">0 / 0 correctas</span>
+    </div>
+    <div class="frow" id="filt"></div>
+    <div class="pbar-w"><div class="pbar" id="pb" style="width:0%"></div></div>
+    <div class="qcard" id="qc"></div>
+    <div class="qnav">
+      <button class="qnbtn" id="bprev" onclick="mQ(-1)" disabled>← Anterior</button>
+      <span style="font-size:11px;color:var(--text3);font-family:var(--mono)" id="qct"></span>
+      <button class="qnbtn" id="bnext" onclick="mQ(1)">Siguiente →</button>
+    </div>
+  </div>
+</div>
+
+<!-- REPASO -->
+<div id="repaso" class="sec">
+  <div class="sec-title">Repaso rápido</div>
+  <div class="sec-sub">Flashcards · Perlas MIR · Errores frecuentes</div>
+  <div class="rtabs">
+    <button class="rtab on" onclick="setR('flash',this)">⚡ Flashcards</button>
+    <button class="rtab" onclick="setR('perlas',this)">💎 Perlas MIR</button>
+    <button class="rtab" onclick="setR('errores',this)">❌ Errores frecuentes</button>
+  </div>
+  <div id="rcontent"></div>
+</div>
+
+<!-- PROGRESO -->
+<div id="progreso" class="sec">
+  <div class="sec-title">Mi progreso</div>
+  <div class="sec-sub">Análisis adaptativo actualizado con cada pregunta respondida.</div>
+  <div class="rec-card"><div class="rec-title">🤖 Recomendación adaptativa</div>
+    <div class="rec-txt" id="rec-txt">Responde preguntas en el Test MIR para recibir una recomendación personalizada.</div>
+  </div>
+  <div class="prog-grid">
+    <div class="prog-card" style="grid-column:1/-1">
+      <div class="dc-lbl" style="margin-bottom:12px">Dominio por áreas</div>
+      <div id="radar"></div>
+    </div>
+    <div class="prog-card">
+      <div class="dc-lbl" style="margin-bottom:9px">Estadísticas</div>
+      <div id="stats"></div>
+    </div>
+    <div class="prog-card">
+      <div class="dc-lbl" style="margin-bottom:9px">Conceptos más fallados</div>
+      <div class="fallos-list" id="fallos"></div>
+    </div>
+  </div>
+</div>
+
+</div><!-- /body -->
+<script>
+
+const TOPICS = {
+"t1": {
+"title": "Tema 1. Patología vascular: generalidades",
+"sub": "Ateromatosis · Buerger · Aneurisma de aorta abdominal",
+"cards": [
+{
+"h": "Introducción",
+"b": "Las enfermedades vasculares periféricas afectan extremidades, abdomen, pelvis y troncos supraaórticos. Incluyen patología <b>arterial</b> (oclusiva, aneurismática, traumática), <b>venosa</b> y <b>linfática</b>. Comparten factores de riesgo cardiovascular y base aterosclerótica.",
+"tags": []
+},
+{
+"h": "Arteriopatía periférica",
+"b": "La <b>aterosclerosis</b> es la causa más frecuente. Síntoma cardinal: <b>claudicación intermitente</b>.<br><br><b>Factores de riesgo:</b> tabaquismo (el más potente), HTA, DM, dislipemia, obesidad.",
+"tags": [
+"t-b:Arterial",
+"t-a:Crónica"
+],
+"mir": "El tabaquismo cuadruplica el riesgo de claudicación intermitente. En la enfermedad de Buerger es el factor etiológico principal.",
+"algo": [
+"Identificar FRCV (tabaco, HTA, DM, dislipemia)",
+"Evaluar síntomas: claudicación, dolor en reposo, lesiones tróficas",
+"ITB + Eco-Doppler",
+"Tratamiento médico ± revascularización"
+]
+},
+{
+"h": "Enfermedad de Buerger",
+"b": "Tromboangeítis obliterante. Inflamación segmentaria <b>no degenerativa</b> de vasos pequeños/medianos. Varones jóvenes (&lt;45 años) fumadores. Patrón en 'sacacorchos' en arteriografía.<br><br><b>Tratamiento fundamental: abandono absoluto del tabaco.</b>",
+"tags": [
+"t-b:Arterial",
+"t-r:Tabaco"
+],
+"mir": "El abandono del tabaco es el ÚNICO tratamiento eficaz en la enfermedad de Buerger. Sin abandono del tabaco, la enfermedad progresa inevitablemente."
+},
+{
+"h": "Aneurisma de aorta abdominal (AAA)",
+"b": "Dilatación &gt;1,5× el diámetro normal. Frecuentemente <b>asintomático hasta la rotura</b>. <b>Cribado:</b> ecografía en varones &gt;65 años con FRCV.<br><br><b>Indicación quirúrgica: ≥5,5 cm o sintomático.</b> Opciones: cirugía abierta o EVAR.",
+"tags": [
+"t-r:Aorta",
+"t-g:Cribado"
+],
+"mir": "CLAVE MIR: Umbral quirúrgico AAA asintomático = 5,5 cm. La rotura del AAA = emergencia quirúrgica absoluta con mortalidad >50%."
+},
+{
+"h": "Ideas clave",
+"b": "• Aterosclerosis: causa más frecuente de arteriopatía periférica.<br>• Claudicación intermitente: síntoma cardinal.<br>• Buerger: varones jóvenes fumadores → abandono del tabaco es el único pilar eficaz.<br>• AAA: asintomático hasta rotura → cribado ecográfico.",
+"tags": []
+}
+]
+},
+"t2": {
+"title": "Tema 2. Isquemia aguda de extremidades",
+"sub": "Embolia · Trombosis · Clasificación de Rutherford · Tratamiento urgente",
+"cards": [
+{
+"h": "Etiología",
+"b": "Causa más frecuente: <b>embolia arterial</b> (origen cardíaco 80%, especialmente FA no anticoagulada). Segunda causa: <b>trombosis in situ</b> sobre arteriopatía aterosclerótica.",
+"tags": [
+"t-r:Urgencia"
+],
+"mir": "La FA no anticoagulada es la causa #1 de embolia arterial. Tras la embolectomía: anticoagulación oral indefinida."
+},
+{
+"h": "Clínica — las 6P",
+"b": "<b>Pain</b> (dolor) · <b>Pallor</b> (palidez) · <b>Pulselessness</b> (ausencia de pulsos) · <b>Paresthesia</b> (parestesias) · <b>Paralysis</b> (parálisis) · <b>Poikilothermia</b> (frialdad).<br><br>Signos tardíos: anestesia y parálisis → isquemia avanzada.",
+"tags": [
+"t-b:Diagnóstico"
+]
+},
+{
+"h": "Clasificación de Rutherford",
+"b": "Tabla de clasificación:",
+"tags": [
+"t-a:Clasificación"
+],
+"table": {
+"headers": [
+"Grado",
+"Categoría",
+"Sensib./Motor",
+"Doppler Art/Ven",
+"Conducta"
+],
+"rows": [
+[
+"I",
+"Viable",
+"Normal / Normal",
+"+ / +",
+"Médico"
+],
+[
+"IIA",
+"Amenaza marginal",
+"Mínima / Normal",
+"− / +",
+"Revasc. preferente"
+],
+[
+"IIB",
+"Amenaza inmediata",
+"Moderada / Parálisis",
+"− / +",
+"Revasc. INMEDIATA"
+],
+[
+"III",
+"Irreversible",
+"Anestesia / Rigor",
+"− / −",
+"AMPUTACIÓN"
+]
+],
+"rowColors": [
+"#F0FDF4",
+"#FEFCE8",
+"#FEF3C7",
+"#FEE2E2"
+]
+},
+"mir": "TRAMPA MIR: Rutherford IIB con parálisis = Fogarty urgente. La fibrinólisis está CONTRAINDICADA en IIB (tarda 4-6h)."
+},
+{
+"h": "Diagnóstico y tratamiento",
+"b": "<b>Diagnóstico:</b> Clínico + ECG (buscar FA) + Doppler continuo + CPK.<br><b>Norma:</b> las pruebas de imagen NO deben retrasar la revascularización urgente.<br><b>Tratamiento:</b> Heparina sódica IV → Embolectomía con catéter de Fogarty → vigilar síndrome compartimental.",
+"tags": [
+"t-g:Tratamiento"
+],
+"algo": [
+"¿Parálisis/anestesia? → Rutherford IIb → Cirugía INMEDIATA",
+"Heparina sódica IV de inicio",
+"Embolectomía con catéter de Fogarty",
+"Vigilar síndrome compartimental post-revascularización",
+"Tratar causa subyacente (FA → anticoagulación indefinida)"
+]
+}
+]
+},
+"t3": {
+"title": "Tema 3. Patología de los troncos supraaórticos",
+"sub": "Ictus isquémico · Estenosis carotídea · AIT",
+"cards": [
+{
+"h": "Epidemiología",
+"b": "El ictus isquémico es la <b>2ª causa de mortalidad</b> y la <b>1ª causa de discapacidad</b> en adultos. Causa más frecuente: aterosclerosis carotídea (30-35%).<br><br><b>El AIT debe tratarse como urgencia vital:</b> 25% de los ictus ha sido precedido por un AIT.",
+"tags": [
+"t-r:Urgencia"
+],
+"mir": "AIT = urgencia neurológica. Riesgo de ictus en las 48h siguientes: 10-15%."
+},
+{
+"h": "Diagnóstico",
+"b": "Prueba inicial de elección: <b>Eco-Doppler color carotídeo</b>. Arteriografía: referencia para planificación quirúrgica.<br>Síntomas de alerta: soplo carotídeo, AIT, amaurosis fugax, ictus establecido.",
+"tags": [
+"t-b:Diagnóstico"
+]
+},
+{
+"h": "Tratamiento",
+"b": "<b>Ictus agudo:</b> trombolisis con rtPA IV en &lt;3 horas.<br><b>Prevención secundaria:</b> antiagregación (AAS/clopidogrel) + estatinas.<br><b>Estenosis carotídea sintomática &gt;70%:</b> endarterectomía carotídea o stent en los primeros 14 días.",
+"tags": [
+"t-g:Tratamiento"
+],
+"mir": "La endarterectomía carotídea en estenosis sintomática >70% reduce el riesgo de ictus en un 65-70% a 5 años."
+}
+]
+},
+"t4": {
+"title": "Tema 4. Isquemia crónica de EEII",
+"sub": "Clasificación de Fontaine · ITB · TASC · Revascularización",
+"cards": [
+{
+"h": "Clasificación de Fontaine",
+"b": "Clasificación por estadios:",
+"tags": [
+"t-a:Clasificación"
+],
+"table": {
+"headers": [
+"Estadio",
+"Clínica"
+],
+"rows": [
+[
+"I",
+"Asintomático (ITB alterado)"
+],
+[
+"IIa",
+"Claudicación >150 m"
+],
+[
+"IIb",
+"Claudicación <150 m"
+],
+[
+"III",
+"Dolor en reposo"
+],
+[
+"IV",
+"Lesiones tróficas (úlceras / gangrena)"
+]
+],
+"rowColors": [
+"#F0FDF4",
+"#FFFBEB",
+"#FEF3C7",
+"#FEE2E2",
+"#FEE2E2"
+]
+},
+"mir": "ITB < 0,9 = isquemia. ITB > 1,3 en diabético = calcificación (no interpretable). Estadios III-IV = isquemia crítica = revascularización urgente."
+},
+{
+"h": "Diagnóstico",
+"b": "<b>ITB:</b> prueba funcional de referencia. Normal: 0,9-1,3.<br><b>Eco-Doppler:</b> morfología y flujo.<br><b>Arteriografía:</b> patrón de referencia para planificación quirúrgica.<br><b>Angio-TC / Angio-RM:</b> estudio anatómico preciso.",
+"tags": [
+"t-b:Diagnóstico"
+]
+},
+{
+"h": "Tratamiento médico",
+"b": "Base del manejo en <b>todos los pacientes</b>:<br>• Control de FRCV: cese del tabaco, HTA, DM<br>• <b>Antiagregación</b> (AAS o clopidogrel) + <b>Estatinas</b> (independientemente del LDL)<br>• Programa de ejercicio físico supervisado<br>• Cilostazol: en estadio IIb mejora la distancia de claudicación",
+"tags": [
+"t-g:Médico"
+]
+},
+{
+"h": "Tratamiento quirúrgico",
+"b": "<b>Endovascular:</b> angioplastia + stent (TASC A-B).<br><b>Bypass aortobifemoral:</b> elección en lesiones aortoilíacas graves. Permeabilidad 80% a 5 años.<br><b>Bypass infrainguinal:</b> vena safena autóloga = mejor material de injerto.<br><b>Amputación:</b> último recurso en isquemia irreversible.",
+"tags": [
+"t-r:Quirúrgico"
+],
+"mir": "Vena safena autóloga = mejor injerto infrainguinal. Bypass aortobifemoral = gold standard para lesiones aortoilíacas extensas (TASC C-D)."
+}
+]
+},
+"t5": {
+"title": "Tema 5. Insuficiencia venosa crónica",
+"sub": "Varices · Síndrome postrombótico · Clasificación CEAP",
+"cards": [
+{
+"h": "Clasificación CEAP",
+"b": "<b>C0:</b> Sin signos · <b>C1:</b> Telangiectasias · <b>C2:</b> Varices · <b>C3:</b> Edema venoso · <b>C4a:</b> Pigmentación/eccema · <b>C4b:</b> Lipodermatoesclerosis · <b>C5:</b> Úlcera cicatrizada · <b>C6:</b> Úlcera activa.",
+"tags": [
+"t-a:Clasificación"
+]
+},
+{
+"h": "Etiología",
+"b": "<b>Primaria:</b> causa más frecuente. Incompetencia valvular primaria. Base hereditaria.<br><b>Secundaria (SPT):</b> secuela de TVP. Destrucción valvular → reflujo crónico.<br><b>Congénita:</b> agenesia valvular (muy rara).",
+"tags": [
+"t-b:Venoso"
+],
+"mir": "Las varices en el síndrome postrombótico son colateralidad venosa. Extirparlas está CONTRAINDICADO porque agravaría el retorno venoso."
+},
+{
+"h": "Tratamiento",
+"b": "<b>Conservador:</b> compresión elástica (pilar fundamental), fármacos venoactivos.<br><b>Escleroterapia:</b> telangiectasias y varices pequeñas.<br><b>Técnicas térmicas:</b> láser / radiofrecuencia endovenosa.<br><b>Cirugía:</b> fleboextracción safena.<br><b>Importante:</b> NO operar varices secundarias al síndrome postrombótico.",
+"tags": [
+"t-g:Tratamiento"
+]
+}
+]
+},
+"t6": {
+"title": "Tema 6. Enfermedad tromboembólica venosa",
+"sub": "TVP · TEP · Escala de Wells · Anticoagulación",
+"cards": [
+{
+"h": "TVP y TEP",
+"b": "La TVP y el TEP forman el espectro de la ETEV. <b>Triada de Virchow:</b> estasis venosa + hipercoagulabilidad + daño endotelial. El TEP masivo con inestabilidad hemodinámica tiene mortalidad >50% sin tratamiento.",
+"tags": [
+"t-r:Urgencia"
+]
+},
+{
+"h": "Diagnóstico",
+"b": "<b>Escala de Wells:</b> probabilidad clínica pretest.<br><b>Dímero D negativo</b> + baja probabilidad clínica: excluye TVP sin imagen. VPN > 99%.<br><b>Eco-Doppler venoso:</b> prueba de elección para confirmar TVP.<br><b>Angio-TC torácico:</b> confirma TEP.",
+"tags": [
+"t-b:Diagnóstico"
+],
+"mir": "Dímero D negativo + Wells < 2 = excluye TVP sin eco-Doppler. VPN > 99%."
+},
+{
+"h": "Tratamiento",
+"b": "<b>HBPM:</b> anticoagulación inicial de elección.<br><b>ACOD (rivaroxabán, apixabán):</b> tratamiento a largo plazo, mínimo 3 meses.<br><b>Filtro de VCI:</b> si contraindicación absoluta para anticoagulación.<br><b>Trombólisis sistémica:</b> TEP masivo con TA &lt;90 mmHg.",
+"tags": [
+"t-g:Tratamiento"
+]
+}
+]
+},
+"t7": {
+"title": "Tema 7. Linfáticos y pie diabético",
+"sub": "Linfedema · Clasificación de Wagner · Úlcera neuropática/isquémica",
+"cards": [
+{
+"h": "Linfedema",
+"b": "<b>Primario:</b> congénito o de desarrollo. <b>Secundario:</b> obstrucción linfática (neoplasia, cirugía, radioterapia). Clínica: edema duro, no deja fóvea, <b>signo de Stemmer positivo</b>.<br>Tratamiento: drenaje linfático manual + vendaje multicapa.",
+"tags": [
+"t-b:Linfático"
+]
+},
+{
+"h": "Clasificación de Wagner",
+"b": "Clasificación del pie diabético:",
+"tags": [
+"t-a:Clasificación"
+],
+"table": {
+"headers": [
+"Grado",
+"Lesión"
+],
+"rows": [
+[
+"0",
+"Pie en riesgo (sin úlcera)"
+],
+[
+"1",
+"Úlcera superficial"
+],
+[
+"2",
+"Úlcera profunda (tendón/cápsula)"
+],
+[
+"3",
+"Úlcera + osteomielitis / absceso"
+],
+[
+"4",
+"Gangrena parcial (antepié)"
+],
+[
+"5",
+"Gangrena del pie completo"
+]
+],
+"rowColors": [
+"#F0FDF4",
+"#FFFBEB",
+"#FEFCE8",
+"#FEF3C7",
+"#FEE2E2",
+"#FEE2E2"
+]
+},
+"mir": "Pie diabético: tríada fisiopatológica = neuropatía + isquemia + infección. Los tres deben tratarse simultáneamente. La revascularización distal puede evitar la amputación."
+},
+{
+"h": "Manejo multidisciplinar",
+"b": "<b>Neuropático:</b> descarga + curas + desbridamiento.<br><b>Isquémico:</b> revascularización (incluso vasos distales).<br><b>Infeccioso:</b> cultivos ANTES de iniciar ATB → antibioterapia dirigida → descartar osteomielitis.<br><b>Equipo:</b> Cirugía Vascular + Endocrinología + Infectología + Cirugía Ortopédica.",
+"tags": [
+"t-g:Tratamiento"
+]
+}
+]
+},
+"t8": {
+"title": "Tema 8. Patología de la aorta",
+"sub": "Aneurisma · Disección aórtica (Stanford) · EVAR · TEVAR",
+"cards": [
+{
+"h": "Aneurisma de aorta abdominal (AAA)",
+"b": "Dilatación &gt;3 cm o &gt;1,5× el diámetro normal. <b>FR:</b> tabaquismo, HTA, aterosclerosis. Asintomático hasta la rotura: dolor brusco + hipotensión + masa pulsátil.<br><br><b>Cirugía electiva:</b> ≥5,5 cm o sintomático. Opciones: EVAR o cirugía abierta.",
+"tags": [
+"t-r:Aorta"
+],
+"mir": "AAA roto: mortalidad 50-90%. Hipotensión permisiva (TA sistólica 50-70 mmHg) hasta el quirófano. No hiperhidratar."
+},
+{
+"h": "Disección aórtica",
+"b": "Desgarro de la íntima con entrada de sangre en la capa media.<br><b>Stanford A</b> (afecta aorta ascendente): cirugía urgente — mortalidad 1-2%/hora sin tratamiento.<br><b>Stanford B no complicada:</b> betabloqueantes IV.<br><b>Stanford B complicada:</b> TEVAR.<br><br>Clínica: dolor desgarrador brusco + diferencia de TA entre brazos &gt;20 mmHg + ensanchamiento mediastínico.",
+"tags": [
+"t-r:Urgencia"
+],
+"mir": "TRAMPA MIR: La disección tipo A puede dar troponinas positivas. NUNCA anticoagular sin Angio-TC confirmatorio. Diferencia de TA entre brazos = clave diferencial."
+}
+]
+},
+"t9": {
+"title": "Tema 9. Traumatismos vasculares",
+"sub": "Lesiones penetrantes y contusas · Pseudoaneurisma · Fístula AV",
+"cards": [
+{
+"h": "Epidemiología",
+"b": "Varones jóvenes (15-49 años). Lesiones periféricas: 80%.<br><b>REGLA FUNDAMENTAL: el pulso palpable NO excluye lesión vascular.</b> Hasta el 25% de los pacientes con lesión vascular significativa conservan pulsos distales.",
+"tags": [
+"t-r:Trauma"
+],
+"mir": "Luxación de rodilla = arteriografía urgente incluso con pulso presente. Arteria poplítea en riesgo en el 25-40% de las luxaciones."
+},
+{
+"h": "Tipos de lesión",
+"b": "<b>Laceración parcial:</b> hematoma expansivo, hemorragia.<br><b>Transección completa:</b> ausencia de pulsos, isquemia franca.<br><b>Contusión arterial:</b> inicialmente normal → puede progresar a trombosis en horas.<br><b>Pseudoaneurisma:</b> soplo sistólico + frémito.<br><b>Fístula AV:</b> soplo continuo en maquinaria + frémito.",
+"tags": [
+"t-b:Diagnóstico"
+],
+"mir": "Pseudoaneurisma = soplo SISTÓLICO. Fístula AV = soplo CONTINUO (sistólico + diastólico, 'en maquinaria')."
+},
+{
+"h": "Tratamiento",
+"b": "Control de la hemorragia: compresión directa, torniquete. Diagnóstico: Eco-Doppler + Angio-TC. Reparación quirúrgica o endovascular urgente.",
+"tags": [
+"t-g:Urgencia"
+]
+}
+]
+},
+"t10": {
+"title": "Tema 10. Angiodisplasias y trastornos funcionales",
+"sub": "Raynaud · Eritromelalgia · MAV · Hemangiomas",
+"cards": [
+{
+"h": "Fenómeno de Raynaud",
+"b": "<b>Primario:</b> hiperactividad simpática idiopática. Trifásico: palidez → cianosis → hiperemia reactiva. Desencadenante: frío o estrés.<br>Tratamiento: evitar frío + <b>antagonistas del calcio (nifedipino)</b>.<br><br><b>Secundario:</b> asociado a lupus, esclerodermia. Puede producir necrosis distal.",
+"tags": [
+"t-b:Funcional"
+],
+"mir": "Betabloqueantes CONTRAINDICADOS en Raynaud (agravan el vasoespasmo). Primera línea: nifedipino."
+},
+{
+"h": "Otros trastornos funcionales",
+"b": "<b>Acrocianosis:</b> coloración azulada permanente, bilateral, benigna.<br><b>Livedo reticularis:</b> patrón reticular violáceo. Fisiológica o asociada a vasculitis/SAF.<br><b>Eritromelalgia:</b> dolor urente + calor local + eritema. Desencadenante: calor.",
+"tags": [
+"t-a:Funcional"
+]
+},
+{
+"h": "Angiodisplasias",
+"b": "<b>Hemangiomas:</b> tumor vascular benigno. Crecimiento rápido + involución espontánea hasta los 7-9 años. Tratamiento: propranolol oral.<br><b>Malformaciones vasculares:</b> NO involucionan. MAV, malformaciones venosas/linfáticas. Escleroterapia, embolización, cirugía.",
+"tags": [
+"t-g:Vascular"
+]
+}
+]
+},
+"t11": {
+"title": "Tema 11. Patología de las arterias viscerales",
+"sub": "Isquemia mesentérica · Isquemia renal · Aneurismas viscerales",
+"cards": [
+{
+"h": "Isquemia mesentérica aguda",
+"b": "<b>Tipos:</b> embólica (50%, FA), trombótica (25%), no oclusiva (NOMI), trombosis venosa.<br><b>Clínica clave:</b> dolor abdominal intenso <u>desproporcionado a la exploración</u> (abdomen blando con dolor severo).<br>Alta mortalidad si diagnóstico tardío.",
+"tags": [
+"t-r:Urgencia"
+],
+"mir": "'Abdomen blando con dolor severo' = isquemia mesentérica hasta que se demuestre lo contrario. Mortalidad × 3 si el diagnóstico se hace después de las 12 horas."
+},
+{
+"h": "Isquemia mesentérica crónica",
+"b": "<b>Angina intestinal:</b> dolor posprandial + pérdida de peso + <b>sitofobia</b> (miedo a comer). Diagnóstico: Eco-Doppler mesentérico + Angio-TC. Tratamiento: stent o bypass.",
+"tags": [
+"t-a:Crónica"
+]
+},
+{
+"h": "Isquemia renal y aneurismas viscerales",
+"b": "<b>Isquemia renal:</b> estenosis de arteria renal → HTA renovascular de difícil control. Angioplastia ± stent en casos seleccionados.<br><b>Aneurismas viscerales:</b> arteria esplénica (más frecuente, riesgo especial en embarazo). Tratamiento electivo en &gt;2 cm o sintomáticos.",
+"tags": [
+"t-b:Diagnóstico"
+]
+}
+]
+},
+"s1": {
+"title": "Seminario 1. Exploración vascular",
+"sub": "Semiología · Doppler · ITB · Técnicas no invasivas",
+"cards": [
+{
+"h": "Exploración física sistematizada",
+"b": "<b>Inspección:</b> coloración, trofismo cutáneo, úlceras, edemas.<br><b>Palpación:</b> pulsos en todos los niveles (femoral, poplíteo, pedio, tibial posterior en MMII).<br><b>Auscultación:</b> soplos arteriales (carótidas, aorta, femorales).<br><b>Maniobras:</b> prueba de Buerger, prueba de Allen.",
+"tags": [
+"t-b:Exploración"
+]
+},
+{
+"h": "Índice tobillo-brazo (ITB)",
+"b": "Cociente entre la presión sistólica en tobillo (mayor de pedia y tibial posterior) y la braquial mayor.<br><br><b>Valores:</b> 0,9-1,3 normal · 0,7-0,9 isquemia leve · 0,5-0,7 moderada · &lt;0,5 severa / crítica · &gt;1,3 calcificación (no interpretable en DM).",
+"tags": [
+"t-a:ITB"
+],
+"mir": "En el diabético, ITB >1,3 = mediocalcinosis = no interpretable. Alternativa: presión digital en dedos del pie. Presión digital < 30 mmHg = isquemia crítica."
+},
+{
+"h": "Eco-Doppler y técnicas avanzadas",
+"b": "Eco-Doppler dúplex: imagen morfológica + análisis hemodinámico.<br>Curva <b>trifásica</b>: normal · <b>bifásica</b>: estenosis leve · <b>monofásica</b>: estenosis significativa proximal.",
+"tags": [
+"t-g:Diagnóstico"
+]
+}
+]
+},
+"s2": {
+"title": "Seminario 2. Diagnóstico diferencial del edema",
+"sub": "Venoso · Linfático · Cardíaco · Renal · Hipoproteinémico",
+"cards": [
+{
+"h": "Tipos de edema en EEII",
+"b": "Diagnóstico diferencial:",
+"tags": [
+"t-b:DD"
+],
+"table": {
+"headers": [
+"Tipo",
+"Lateralidad",
+"Fóvea",
+"Característica"
+],
+"rows": [
+[
+"Venoso",
+"Unilateral",
+"Sí",
+"Varices, TVP, tinte violáceo"
+],
+[
+"Linfático",
+"Uni/bilateral",
+"No",
+"Duro, Stemmer positivo"
+],
+[
+"Cardíaco",
+"Bilateral",
+"Sí",
+"Maleolar vespertino, mejora con decúbito"
+],
+[
+"Renal",
+"Bilateral",
+"Sí",
+"Periorbitario + maleolar"
+],
+[
+"Hipoproteinémico",
+"Bilateral",
+"Sí",
+"Ascitis / derrame pleural"
+]
+],
+"rowColors": [
+"#fff",
+"#F9FAFB",
+"#fff",
+"#F9FAFB",
+"#fff"
+]
+},
+"mir": "Signo de Stemmer positivo (no se puede pellizcar la piel dorsal del 2.° dedo del pie) = linfedema. En el lipedema el Stemmer es NEGATIVO y el edema respeta el pie."
+}
+]
+},
+"s3": {
+"title": "Seminario 3. Úlceras en EEII",
+"sub": "Venosas · Arteriales · Neuropáticas · Diagnóstico diferencial",
+"cards": [
+{
+"h": "Úlceras venosas (70-80% del total)",
+"b": "<b>Localización:</b> región maleolar interna (gaiter area). Bordes irregulares, fondo granulomatoso, exudativas. Asociadas a dermatitis ocre, lipodermatoesclerosis, varices. Pulsos presentes. ITB normal.<br><b>Tratamiento:</b> compresión elástica + curas locales.",
+"tags": [
+"t-b:Venoso"
+]
+},
+{
+"h": "Úlceras arteriales (isquémicas)",
+"b": "<b>Localización:</b> zonas acras (dedos, talón, maléolo lateral). Bordes definidos, fondo pálido o necrótico, <b>muy dolorosas</b>. Pulsos ausentes, ITB &lt;0,5.<br><b>Tratamiento:</b> revascularización urgente en isquemia crítica.",
+"tags": [
+"t-r:Arterial"
+],
+"mir": "Úlcera arterial = muy dolorosa, acral, pulsos ausentes. Úlcera venosa = maleolar interna, pulsos presentes. Neuropática = indolora, plantar, pulsos presentes."
+},
+{
+"h": "Úlceras neuropáticas",
+"b": "<b>Localización:</b> zonas de presión plantar (cabezas metatarsianas, talón). <b>Indoloras.</b> Rodeadas de hiperqueratosis. Pulsos generalmente presentes.<br><b>Tratamiento:</b> descarga + desbridamiento + control glucémico.",
+"tags": [
+"t-a:Neuropático"
+]
+}
+]
+},
+"s4": {
+"title": "Seminario 4. Casos clínicos",
+"sub": "Razonamiento diagnóstico y terapéutico estructurado",
+"cards": [
+{
+"h": "Metodología del razonamiento clínico",
+"b": "Secuencia estructurada: <b>anamnesis dirigida</b> → <b>exploración física sistematizada</b> → <b>pruebas complementarias</b> → <b>diagnóstico diferencial</b> → <b>plan terapéutico</b>.",
+"tags": []
+},
+{
+"h": "Aprendizajes transversales",
+"b": "• La <b>FA no anticoagulada</b> = causa #1 de embolia arterial → anticoagulación oral indefinida.<br>• <b>ITB no interpretable en DM</b> por calcificación → presiones en dedos.<br>• En pie diabético isquémico: revascularización distal puede evitar la amputación.<br>• Úlcera diabética con fiebre: cultivos ANTES del antibiótico + valorar osteomielitis.<br>• <b>El pulso presente no excluye lesión vascular</b> (hasta 25% conservan pulsos con lesión).",
+"tags": [
+"t-g:Integración"
+]
+}
+]
+}
+};
+const PAGES = {"t1": 13, "t2": 15, "t3": 15, "t4": 15, "t5": 14, "t6": 15, "t7": 15, "t8": 14, "t9": 14, "t10": 15, "t11": 15, "s1": 15, "s2": 13, "s3": 15, "s4": 13};
+const QUESTIONS = [{"id": 1, "t": "arterial", "tl": "Isquemia aguda", "lvl": 2, "q": "Paciente de 72 años con FA crónica no anticoagulada presenta de forma brusca frialdad, palidez, ausencia de pulsos y parálisis del pie derecho de 2 horas de evolución. ¿Cuál es la clasificación de Rutherford y el tratamiento inmediato?", "opts": ["Rutherford I — heparina IV y observación", "Rutherford IIA — heparina IV y fibrinólisis intraarterial", "Rutherford IIB — heparina IV + embolectomía urgente con catéter de Fogarty", "Rutherford III — amputación primaria urgente", "Rutherford IIA — angioplastia percutánea y anticoagulación"], "c": 2, "exp": "Parálisis + Doppler arterial ausente + Doppler venoso presente = Rutherford IIB (amenaza inmediata). El tratamiento es heparina IV de inicio + embolectomía quirúrgica urgente con catéter de Fogarty. La fibrinólisis está contraindicada en IIB porque tarda 4-6h, tiempo que este paciente no tiene.", "mir": "REGLA DE ORO: Parálisis = Rutherford IIB = Fogarty urgente. Nunca fibrinólisis con parálisis presente. Tras la embolectomía: anticoagulación indefinida por la FA subyacente."}, {"id": 2, "t": "arterial", "tl": "Isquemia crónica", "lvl": 2, "q": "Paciente con claudicación intermitente que aparece a los 80 metros e ITB de 0,62 en el miembro derecho. ¿En qué estadio de Fontaine se encuentra y cuál es el tratamiento de primera línea?", "opts": ["Fontaine I — observación y cribado", "Fontaine IIa — antiagregación + estatinas + ejercicio supervisado", "Fontaine IIb — antiagregación + estatinas + cilostazol + ejercicio supervisado", "Fontaine III — revascularización urgente", "Fontaine IV — amputación valorando isquemia crítica"], "c": 2, "exp": "Claudicación < 150 metros = Fontaine IIb. ITB 0,62 = isquemia moderada. El tratamiento incluye antiagregación + estatinas + ejercicio supervisado + cilostazol (demostrado en IIb para mejorar distancia de claudicación).", "mir": "El cilostazol está indicado SOLO en Fontaine IIb (claudicación < 150m). Contraindicado en insuficiencia cardíaca."}, {"id": 3, "t": "venoso", "tl": "Insuf. venosa", "lvl": 2, "q": "Mujer de 58 años con síndrome postrombótico presenta varices en EEII izquierda y edema crónico. Eco-Doppler: reflujo venoso profundo severo con venas varicosas secundarias. ¿Cuál es el tratamiento correcto?", "opts": ["Fleboextracción de la vena safena interna izquierda", "Escleroterapia de todas las varices visibles", "Compresión elástica intensa + venoactivos sin cirugía de varices", "Radiofrecuencia endovenosa + flebectomías ambulatorias", "Anticoagulación indefinida con rivaroxabán"], "c": 2, "exp": "En el síndrome postrombótico, las varices son SECUNDARIAS y funcionan como vías de colateralidad venosa. Extirparlas puede comprometer el retorno venoso y empeorar el cuadro. La única opción correcta es el tratamiento conservador: compresión elástica de alta compresión + venoactivos.", "mir": "CONTRAINDICACIÓN ABSOLUTA en el síndrome postrombótico: cirugía de varices (fleboextracción, escleroterapia, radiofrecuencia)."}, {"id": 4, "t": "aorta", "tl": "Patología aórtica", "lvl": 2, "q": "¿A partir de qué diámetro se indica la reparación electiva de un aneurisma de aorta abdominal (AAA) asintomático en un varón?", "opts": ["3,5 cm", "4,0 cm", "4,5 cm", "5,5 cm", "7,0 cm"], "c": 3, "exp": "El umbral quirúrgico estándar para el AAA asintomático es ≥5,5 cm en varones. Por debajo de ese umbral, el riesgo quirúrgico supera el beneficio y se opta por vigilancia activa.", "mir": "CLAVE MIR: AAA ≥5,5 cm o sintomático = indicación quirúrgica. AAA roto = emergencia absoluta."}, {"id": 5, "t": "venoso", "tl": "ETEV", "lvl": 3, "q": "Varón de 45 años, sin antecedentes, 8 días después de artroplastia de rodilla presenta disnea súbita, taquicardia (118 lpm) y SatO2 88%. TA: 85/50 mmHg. Dímero D muy elevado. ¿Cuál es la conducta inmediata?", "opts": ["HBPM a dosis profilácticas + oxígeno", "HBPM a dosis terapéuticas + Angio-TC urgente", "Trombólisis sistémica urgente con alteplasa IV", "Filtro de vena cava inferior urgente", "Anticoagulación oral con rivaroxabán y valoración ambulatoria"], "c": 2, "exp": "La hipotensión (TA < 90 mmHg) define el TEP MASIVO con inestabilidad hemodinámica. En este escenario la trombólisis sistémica está indicada porque el riesgo de muerte por TEP masivo supera el riesgo hemorrágico.", "mir": "TEP masivo (TA < 90 mmHg) = trombólisis sistémica con alteplasa. TEP de bajo riesgo = anticoagulación oral."}, {"id": 6, "t": "trauma", "tl": "Traumatismos", "lvl": 3, "q": "Varón de 25 años con luxación de rodilla derecha en accidente de moto. Exploración inicial: pulso poplíteo derecho débil pero presente. No hay déficit neurológico. ¿Cuál es la conducta más adecuada?", "opts": ["El pulso presente descarta lesión vascular: inmovilizar y observar", "Fasciotomía preventiva inmediata bilateral", "Arteriografía o angio-TC urgente pese a que el pulso es palpable", "Exploración quirúrgica directa sin imagen previa", "Anticoagulación y seguimiento con ITB seriado"], "c": 2, "exp": "REGLA DE ORO: El pulso palpable NO excluye lesión vascular. En la luxación de rodilla, hasta el 25-35% de las lesiones de la arteria poplítea se presentan con pulso inicial conservado (flap intimal, espasmo). SIEMPRE se requiere estudio vascular con Angio-TC o arteriografía.", "mir": "Luxación de rodilla = hasta 40% de lesión de arteria poplítea. SIEMPRE arteriografía o Angio-TC aunque el pulso esté presente."}, {"id": 7, "t": "arterial", "tl": "Aterosclerosis", "lvl": 1, "q": "¿Cuál es el factor de riesgo cardiovascular más potente para el desarrollo de arteriopatía periférica y enfermedad de Buerger?", "opts": ["Hipertensión arterial sistémica", "Diabetes mellitus tipo 2", "Tabaquismo activo", "Dislipemia (hipercolesterolemia)", "Obesidad abdominal"], "c": 2, "exp": "El tabaquismo es el factor de riesgo más potente para la arteriopatía periférica: cuadruplica el riesgo de claudicación intermitente. En la enfermedad de Buerger, el tabaco es el FACTOR ETIOLÓGICO principal.", "mir": "En Buerger: el abandono del tabaco es el único tratamiento eficaz. Sin abandono del tabaco, la enfermedad progresa inevitablemente."}, {"id": 8, "t": "funcional", "tl": "Trastornos funcionales", "lvl": 3, "q": "Mujer de 35 años, sin enfermedades previas, presenta episodios de palidez → cianosis → rubor en los dedos de ambas manos, desencadenados por el frío. ¿Cuál es el tratamiento farmacológico de primera línea?", "opts": ["Betabloqueantes cardioselectivos (bisoprolol)", "Antagonistas del calcio dihidropiridínicos (nifedipino)", "Antiagregación con AAS 100 mg", "Corticoides sistémicos (prednisona)", "Simpatectomía cervical laparoscópica"], "c": 1, "exp": "El fenómeno de Raynaud primario se trata en primera línea con antagonistas del calcio dihidropiridínicos (nifedipino). Los betabloqueantes están CONTRAINDICADOS: bloquean los receptores beta2 vasodilatadores y agravan el vasoespasmo.", "mir": "TRAMPA FRECUENTE: Los betabloqueantes están CONTRAINDICADOS en Raynaud. Primera línea = nifedipino (antagonista del calcio)."}, {"id": 9, "t": "aorta", "tl": "Disección aórtica", "lvl": 4, "q": "Varón de 52 años, hipertenso, presenta dolor torácico brusco desgarrador irradiado a la espalda. TA: 195/100 brazo derecho, 145/85 brazo izquierdo. Angio-TC: disección desde la raíz aórtica hasta la ilíaca derecha. ¿Cuál es el tratamiento definitivo?", "opts": ["Tratamiento médico con betabloqueantes IV y observación en UCI", "TEVAR (prótesis endovascular torácica) urgente", "Cirugía urgente de reemplazo de aorta ascendente", "Anticoagulación con heparina + fibrinólisis sistémica", "EVAR de aorta abdominal urgente"], "c": 2, "exp": "Disección que afecta la raíz aórtica = tipo A de Stanford = EMERGENCIA QUIRÚRGICA ABSOLUTA con mortalidad del 1-2% por hora sin tratamiento. El reemplazo urgente de la aorta ascendente es el único tratamiento que modifica el pronóstico.", "mir": "Diferencia de TA entre brazos > 20 mmHg en dolor torácico desgarrador = disección aórtica. Tipo A = quirúrgico URGENTE. Tipo B no complicada = médico (betabloqueantes)."}, {"id": 10, "t": "arterial", "tl": "Pie diabético", "lvl": 3, "q": "Paciente diabético de 60 años con DM tipo 2 de 15 años presenta úlcera indolora en el primer dedo del pie. ITB bilateral > 1,3. Radiografía de pie: sin signos de osteomielitis. ¿Cuál es el paso diagnóstico más importante?", "opts": ["Calcular el ITB con esfuerzo en tapiz rodante", "Medir la presión sistólica en el dedo del pie (presión digital)", "Arteriografía diagnóstica urgente de EEII", "Antibioterapia empírica oral de amplio espectro", "Amputación del dedo sin más estudios"], "c": 1, "exp": "En el diabético, la mediocalcinosis hace que las arterias sean incompresibles, elevando falsamente el ITB > 1,3. Este ITB NO ES INTERPRETABLE. La alternativa de elección es la PRESIÓN DIGITAL. Presión digital < 30-50 mmHg = isquemia crítica que requiere revascularización.", "mir": "REGLA DEL DIABÉTICO: ITB > 1,3 = calcificación = no interpretable. Alternativa: presión digital. Nunca amputar sin valorar si es revascularizable."}, {"id": 11, "t": "venoso", "tl": "Insuf. venosa", "lvl": 2, "q": "Paciente con insuficiencia venosa crónica presenta edema maleolar bilateral, pigmentación ocre y lipodermatoesclerosis sin úlcera activa. ¿En qué estadio CEAP se encuentra?", "opts": ["C3 (edema venoso)", "C4a (pigmentación o eccema)", "C4b (lipodermatoesclerosis o atrophie blanche)", "C5 (úlcera cicatrizada)", "C6 (úlcera activa)"], "c": 2, "exp": "C4b corresponde específicamente a lipodermatoesclerosis y/o atrophie blanche. C4a es solo pigmentación o eccema sin lipodermatoesclerosis. La presencia de lipodermatoesclerosis es el criterio definitorio de C4b.", "mir": "Clasificación CEAP para el MIR: C2=varices, C3=edema, C4a=pigmentación/eccema, C4b=lipodermatoesclerosis, C5=úlcera cicatrizada, C6=úlcera activa."}, {"id": 12, "t": "trauma", "tl": "Traumatismos", "lvl": 3, "q": "Paciente con herida penetrante en el cuello. Hematoma expansivo en zona II, soplo sistólico audible y frémito palpable. Pulsos distales presentes. ¿Diagnóstico más probable y manejo inmediato?", "opts": ["TVP yugular — anticoagulación y observación", "Hematoma cervical benigno — compresión local y alta", "Pseudoaneurisma carotídeo — exploración quirúrgica o endovascular urgente", "Fístula AV carotídeo-yugular — observación y TC diferida", "Lesión venosa exclusiva — vendaje compresivo"], "c": 2, "exp": "Hematoma expansivo + soplo SISTÓLICO + frémito = pseudoaneurisma arterial. La fístula AV tendría soplo CONTINUO (sistólico + diastólico). El pseudoaneurisma requiere reparación urgente por riesgo de rotura y compromiso de vía aérea.", "mir": "Pseudoaneurisma = soplo SISTÓLICO + frémito + hematoma expansivo. Fístula AV = soplo CONTINUO en maquinaria + frémito."}];
+const FLASHCARDS = [
+  {q:"¿Cuáles son las 6P de la isquemia aguda?",a:"Pain (dolor) · Pallor (palidez) · Pulselessness (ausencia de pulsos) · Paresthesia (parestesias) · Paralysis (parálisis) · Poikilothermia (frialdad). Las últimas 2 indican isquemia avanzada → riesgo de irreversibilidad."},
+  {q:"¿Qué define la isquemia crítica de EEII (Fontaine III-IV)?",a:"Estadio III: dolor en reposo (no solo con el esfuerzo). Estadio IV: lesiones tróficas (úlceras o gangrena). La isquemia crítica pone en riesgo la viabilidad de la extremidad. Requiere revascularización urgente."},
+  {q:"¿Cuál es el umbral quirúrgico del AAA asintomático en varones?",a:"≥5,5 cm de diámetro máximo. Por debajo: vigilancia activa con ecografía cada 6-12 meses (según tamaño). El AAA sintomático se opera independientemente del diámetro."},
+  {q:"¿Qué tratamiento farmacológico está CONTRAINDICADO en el fenómeno de Raynaud?",a:"Los betabloqueantes están contraindicados (bloquean la vasodilatación beta2 y agravan el vasoespasmo). Primera línea: antagonistas del calcio dihidropiridínicos (nifedipino)."},
+  {q:"¿Cuál es la clasificación de Stanford de la disección aórtica?",a:"Tipo A: afecta la aorta ascendente (con o sin la descendente) → cirugía urgente. Tipo B: afecta solo la aorta descendente → tratamiento médico (betabloqueantes) ± TEVAR si complicada."},
+  {q:"¿Cuál es el signo de Stemmer y qué indica?",a:"Incapacidad de pellizcar la piel del dorso del 2.° dedo del pie. Signo positivo = linfedema. En el lipedema el Stemmer es NEGATIVO (otra diferencia con el linfedema)."},
+  {q:"¿Por qué el ITB puede no ser interpretable en el paciente diabético?",a:"Por la mediocalcinosis (calcificación de la capa media arterial): las arterias son incompresibles → el manguito no puede ocluirlas → el ITB queda falsamente elevado (>1,3). Solución: presiones en dedos del pie."},
+  {q:"¿Cuál es la triada de Virchow para la trombosis venosa?",a:"Estasis venosa + Hipercoagulabilidad + Daño endotelial. Los 3 factores favorecen la formación del trombo. La inmovilización prolongada combina estasis + daño endotelial (microflebitis)."},
+  {q:"¿En qué consiste el catéter de Fogarty y para qué se usa?",a:"Catéter-balón que se introduce a través de una arteriotomía, se avanza más allá del émbolo, se infla con suero y se retira extrayendo el émbolo. Es la técnica de elección para la embolectomía en la isquemia aguda por embolia sobre arteria sana."},
+  {q:"¿Cuál es la diferencia entre fístula AV traumática y pseudoaneurisma?",a:"Fístula AV: soplo CONTINUO (sistólico + diastólico, 'en maquinaria') + frémito. Pseudoaneurisma: soplo SISTÓLICO + frémito + hematoma pulsátil. Ambas son complicaciones de un traumatismo vascular y requieren tratamiento urgente."},
+  {q:"¿Cuál es la primera línea del tratamiento médico de la claudicación intermitente?",a:"Antiagregación (AAS 100 mg o clopidogrel 75 mg) + Estatinas (independientemente del LDL) + Ejercicio físico supervisado (principal medida no farmacológica). En estadio IIb añadir cilostazol."},
+  {q:"¿Cuál es la clínica típica de la isquemia mesentérica crónica?",a:"Angina intestinal: dolor posprandial (30-60 min tras comer) + pérdida de peso progresiva + sitofobia (miedo a comer). La tríada completa debe orientar al diagnóstico. Confirmar con Eco-Doppler mesentérico + Angio-TC."}
+];
+const PERLAS = [
+  {ico:"⚡",text:"El pulso palpable NO excluye lesión vascular. Hasta el 25% de los pacientes con lesión vascular significativa conservan pulsos distales (flap intimal, espasmo). Ante luxación de rodilla: arteriografía siempre."},
+  {ico:"🩺",text:"La FA no anticoagulada es la causa más frecuente de embolia arterial aguda. Después de la embolectomía con Fogarty: anticoagulación oral indefinida (reducción del 64% en el riesgo de ictus y embolia)."},
+  {ico:"🔴",text:"Disección aórtica tipo A = emergencia quirúrgica ABSOLUTA. Mortalidad 1-2% por hora sin tratamiento. Betabloqueantes IV como puente a la cirugía. NUNCA anticoagular en tipo A (riesgo de hemopericardio)."},
+  {ico:"🦶",text:"En el diabético: ITB >1,3 es NO INTERPRETABLE por mediocalcinosis. Alternativa obligatoria: presión digital en dedos del pie. Presión digital <30 mmHg = isquemia crítica = valorar revascularización."},
+  {ico:"💎",text:"Varices en síndrome postrombótico = colateralidad venosa. Extirparlas está CONTRAINDICADO. El único tratamiento es compresión elástica de alta compresión + venoactivos."},
+  {ico:"⚠️",text:"La úlcera neuropática del pie diabético es INDOLORA por pérdida de la sensibilidad protectora. La ausencia de dolor es un signo de alarma, no de benignidad. Se localiza en zonas de presión plantar (metatarsianos, talón)."},
+  {ico:"🧠",text:"AIT = urgencia neurológica. Riesgo de ictus en las 48h siguientes: 10-15%. Estenosis carotídea sintomática >70% = endarterectomía en los primeros 14 días + antiagregación + estatinas."},
+  {ico:"🔬",text:"Betabloqueantes CONTRAINDICADOS en el fenómeno de Raynaud (agravan el vasoespasmo). Primera línea: nifedipino (antagonista del calcio). En Raynaud secundario a trombocitemia: AAS."}
+];
+const ERRORES = [
+  {wrong:"Anticoagular con heparina IV en disección tipo A",right:"Los betabloqueantes IV son el puente a la cirugía en la disección tipo A. La anticoagulación está contraindicada por riesgo de hemopericardio.",explain:"La disección tipo A requiere cirugía urgente, no anticoagulación. El tratamiento médico solo está indicado en tipo B no complicada."},
+  {wrong:"Operar las varices secundarias en el síndrome postrombótico",right:"Compresión elástica de alta compresión + venoactivos. Las varices secundarias son colateralidad venosa y no deben extirparse.",explain:"Extirpar las varices del SPT puede descompensar el retorno venoso. La cirugía de varices en el SPT está contraindicada."},
+  {wrong:"Calcular solo el ITB en un paciente diabético con úlcera y ITB >1,3",right:"El ITB >1,3 en DM es no interpretable. La alternativa es la presión digital en dedos del pie.",explain:"La mediocalcinosis en el diabético hace las arterias incompresibles. El ITB queda falsamente elevado. Las presiones en dedos son la alternativa validada."},
+  {wrong:"Dar fibrinólisis en una isquemia Rutherford IIB con parálisis",right:"Embolectomía urgente con catéter de Fogarty. La fibrinólisis está contraindicada en IIB por el tiempo que tarda (4-6h).",explain:"En Rutherford IIB el déficit neuromotor indica isquemia avanzada. La fibrinólisis actúa en 4-6h, tiempo que no tiene este paciente. El Fogarty puede actuar en minutos."},
+  {wrong:"Presuponer que un pulso presente descarta lesión vascular en un traumatismo",right:"El pulso presente NO descarta lesión vascular. Hasta el 25% con lesión significativa conservan pulso (flap intimal, espasmo).",explain:"En luxaciones de rodilla y traumatismos vasculares, la arteriografía o Angio-TC están indicadas aunque el pulso sea palpable. Un flap intimal puede trombosarse en horas."},
+  {wrong:"Prescribir betabloqueantes para el fenómeno de Raynaud primario",right:"Primera línea: antagonistas del calcio (nifedipino). Los betabloqueantes bloquean la vasodilatación y agravan el vasoespasmo.",explain:"Los betabloqueantes bloquean los receptores beta2 vasodilatadores periféricos, por lo que agravan el vasoespasmo digital en el Raynaud. Contraindicados."}
+];
+
+const CASOS = [
+{n:1,nivel:"Básico",col:"#DBEAFE",tc:"#1E3A5F",ibg:"#BFDBFE",tag:"Isquemia aguda",ico:"⚡",
+  title:"Isquemia aguda de extremidad superior por embolia",sub:"Mujer, 95 años · FA · Urgencias · Nivel básico",
+  pres:"Mujer de 95 años que acude a Urgencias a las 22:45 h por dolor brusco en extremidad superior izquierda de aparición brusca (hace 3 horas) con imposibilidad de mover los dedos. Antecedentes: HTA, DM tipo 2, sin alergias. No toma anticoagulantes.",
+  expl:["ESI pálida, fría, con anestesia y dificultad para movilizar los dedos","Pulso axilar presente; ausencia de pulso humeral y radial","Flujo Doppler monofásico en arteria radial","ESD: pulsos positivos en todos los niveles","ECG: fibrilación auricular a 94 lpm"],
+  fases:[
+    {fase:"Diagnóstico de Rutherford",pregunta:"Con los datos disponibles, ¿cuál es la clasificación de Rutherford de esta isquemia?",
+      opts:[
+        {t:"Rutherford I — viable, Doppler arterial presente",ok:false,fb:"Incorrecto. En el Rutherford I el Doppler arterial es PRESENTE. En este caso está ausente. Además hay anestesia y parálisis."},
+        {t:"Rutherford IIA — amenaza marginal, parestesias solo en dedos, sin parálisis",ok:false,fb:"Incorrecto. El IIA tiene mínima pérdida sensitiva solo en dedos y NO hay parálisis. En esta paciente hay anestesia extensa y parálisis de los dedos."},
+        {t:"Rutherford IIB — amenaza inmediata: anestesia + parálisis + Doppler arterial ausente + venoso presente",ok:true,fb:"CORRECTO. Anestesia + parálisis + Doppler arterial ausente + venoso presente = Rutherford IIB. Esta clasificación indica amenaza inmediata de la extremidad y requiere revascularización urgente. Tiene una ventana terapéutica de 4-6 horas antes de que la isquemia neurológica sea irreversible."},
+        {t:"Rutherford III — irreversible: anestesia + rigor + Doppler venoso ausente",ok:false,fb:"Incorrecto. El Rutherford III requiere Doppler VENOSO ausente además del arterial, y rigor muscular (contractura). En este caso el Doppler venoso sigue presente."}
+      ]},
+    {fase:"Tratamiento inmediato",pregunta:"Has clasificado la isquemia como Rutherford IIB. ¿Cuál es tu primera actuación?",
+      opts:[
+        {t:"Anticoagular con acenocumarol oral y ingresar en planta para estudio",ok:false,fb:"Incorrecto. El acenocumarol oral tarda 2-4 días en alcanzar nivel terapéutico. Esta paciente necesita anticoagulación INMEDIATA con heparina IV para proteger el lecho distal mientras se prepara la cirugía urgente."},
+        {t:"Heparina sódica IV de inicio + avisar a Cirugía Vascular para embolectomía urgente con catéter de Fogarty",ok:true,fb:"CORRECTO. La heparina IV sódica es el tratamiento inicial inmediato: evita la trombosis secundaria del lecho distal. La embolectomía urgente con catéter de Fogarty es el tratamiento definitivo. En FA como cardiopatía embolígena, tras la recuperación se iniciará anticoagulación oral indefinida."},
+        {t:"Fibrinólisis sistémica IV con alteplasa",ok:false,fb:"Incorrecto. La fibrinólisis sistémica está CONTRAINDICADA en Rutherford IIB con parálisis porque: (1) tarda 4-6 horas en actuar, tiempo que esta paciente no tiene; (2) el déficit motor es contraindicación relativa; (3) la embolectomía con Fogarty es más rápida y eficaz en embolia sobre arteria sana."},
+        {t:"Arteriografía urgente para planificación antes de cualquier tratamiento",ok:false,fb:"Incorrecto. Las pruebas de imagen NO deben retrasar la revascularización en Rutherford IIB. La arteriografía es útil para planificación, pero en una isquemia con amenaza inmediata, el Fogarty puede realizarse sin imagen previa en la arteria humeral."}
+      ]},
+    {fase:"Tratamiento definitivo",pregunta:"Realizada la embolectomía con Fogarty con éxito (recuperación de pulso distal), ¿cuál es el tratamiento a largo plazo?",
+      opts:[
+        {t:"Alta sin tratamiento adicional una vez recuperado el pulso",ok:false,fb:"Incorrecto. La embolia fue de origen cardíaco (FA). Sin tratamiento, el riesgo de nuevo evento embólico es muy alto (5-12%/año en FA sin anticoagular)."},
+        {t:"Antiagregación con AAS indefinida y control cardiológico",ok:false,fb:"Parcialmente correcto. El AAS reduce el riesgo embólico en FA, pero la anticoagulación oral (ACOD o warfarina) es significativamente superior al AAS para la prevención de embolia en FA. Las guías recomiendan anticoagulación en FA con CHA2DS2-VASc ≥ 2 (esta paciente tiene HTA + DM + edad >75 años = score 5)."},
+        {t:"Anticoagulación oral indefinida por FA (ACOD o warfarina con buen control INR)",ok:true,fb:"CORRECTO. La FA es la cardiopatía embolígena tratada con anticoagulación oral. Con el score CHA2DS2-VASc de esta paciente (edad >75 años + HTA + DM = mínimo 5 puntos), la indicación de anticoagulación oral indefinida es categórica. Reduce el riesgo de ictus y embolia en un 64%."},
+        {t:"Cardioversión eléctrica urgente y suspender la anticoagulación",ok:false,fb:"Incorrecto. La cardioversión en FA crónica requiere anticoagulación previa de al menos 3 semanas o descartar trombo auricular con ecocardiograma transesofágico. Además no es urgente en este contexto: la prioridad es el tratamiento anticoagulante."}
+      ]}
+  ],
+  dx:"Isquemia aguda de EESS izquierda por embolia arterial de origen cardíaco (FA no anticoagulada). Rutherford IIB. Tratada con heparina IV + embolectomía con catéter de Fogarty. Anticoagulación oral indefinida por FA.",
+  mirpearl:"REGLA DE ORO: Isquemia aguda + FA = embolia hasta que se demuestre lo contrario. El pulso recuperado tras Fogarty no es el final del tratamiento: la FA subyacente necesita anticoagulación indefinida."
+},
+{n:2,nivel:"Intermedio",col:"#FEF3C7",tc:"#78350F",ibg:"#FDE68A",tag:"Pie diabético",ico:"🦶",
+  title:"Pie diabético neuroisquémico con infección",sub:"Varón, 41 años · DM tipo 1 · Wagner 3 · Nivel intermedio",
+  pres:"Varón de 41 años con DM tipo 1 de 20 años de evolución mal controlada. Derivado desde otro hospital por úlceras en pie diabético de 6 semanas que no han mejorado con antibioterapia oral y curas locales. Presenta fiebre de 38,4°C domiciliaria.",
+  expl:["Úlcera profunda en 1.er dedo e interdigital con exudado purulento y eritema severo","Pulsos femorales y poplíteos bilaterales conservados; ausencia de pulsos distales","ITB bilateral >1,3 (no interpretable por calcificación arterial en DM)","Presiones en dedos: 22 mmHg en pie izquierdo (isquemia crítica <30 mmHg)","Cultivo: Serratia marcescens (resistente a amoxicilina-clavulánico)"],
+  fases:[
+    {fase:"Diagnóstico del tipo de úlcera",pregunta:"¿Cuál es el tipo de úlcera según la clínica disponible?",
+      opts:[
+        {t:"Úlcera venosa — compresión y curas locales",ok:false,fb:"Incorrecto. La úlcera venosa es maleolar interna, exudativa, con varices y dermatitis ocre. No tiene hiperqueratosis ni se asocia a isquemia distal (ITB alterado). Este caso es en un diabético con pulsos distales ausentes."},
+        {t:"Úlcera neuropática pura — descarga y desbridamiento",ok:false,fb:"Parcialmente correcto. Hay componente neuropático (DM, mal perforante plantar). Pero la presión digital de 22 mmHg indica isquemia crítica. Sin el componente isquémico, la úlcera no cicatrizará aunque se desbride y descargue. Es una úlcera NEUROISQUÉMICA (los dos componentes son necesarios para explicar la evolución tórpida)."},
+        {t:"Úlcera neuroisquémica en pie diabético — Wagner 3 (úlcera profunda + infección)",ok:true,fb:"CORRECTO. La combinación de neuropatía (DM de 20 años, localización en zona de presión) + isquemia crítica (presión digital 22 mmHg, ausencia de pulsos distales) + infección (fiebre, exudado purulento, Serratia en cultivo) + profundidad hasta estructuras profundas = Pie diabético neuroisquémico Wagner 3. Los 3 componentes (neuropatía + isquemia + infección) deben tratarse simultáneamente."},
+        {t:"Úlcera arterial isquémica pura — revascularización urgente como único paso",ok:false,fb:"Parcialmente correcto: el componente isquémico es real y necesita revascularización. Pero ignorar la neuropatía y la infección llevaría al fracaso del tratamiento. El pie diabético es siempre una patología multifactorial que requiere abordaje multidisciplinar."}
+      ]},
+    {fase:"Manejo del componente infeccioso",pregunta:"El antibiótico previo (amoxicilina-clavulánico) ha fallado. ¿Cuál es el paso más correcto ahora?",
+      opts:[
+        {t:"Cambiar directamente a antibiótico de amplio espectro IV (piperacilina-tazobactam)",ok:false,fb:"Incorrecto. Aunque la escalada a antibiótico de amplio espectro puede ser necesaria, el paso PREVIO es revisar el resultado del cultivo y ajustar el tratamiento al antibiograma. El cultivo ya tiene resultado: Serratia marcescens. Hay que elegir el antibiótico según la sensibilidad demostrada."},
+        {t:"Guiarse por el cultivo (Serratia marcescens) y ajustar ATB según antibiograma (ciprofloxacino en este caso)",ok:true,fb:"CORRECTO. El cultivo previo al tratamiento es la base del manejo antibiótico en pie diabético. En este caso el cultivo muestra Serratia marcescens sensible a ciprofloxacino (quinolona). El antibiótico dirigido es siempre superior al tratamiento empírico. Además se debe valorar osteomielitis (RM del pie o gammagrafía)."},
+        {t:"Suspender el antibiótico y esperar a la revascularización para que el tejido cicatrice solo",ok:false,fb:"Incorrecto. La infección activa con fiebre y exudado purulento requiere tratamiento antibiótico mientras se organiza la revascularización. Retrasar el antibiótico en presencia de infección activa puede llevar a sepsis y amputación de urgencia."},
+        {t:"Amputación primaria urgente sin más estudios por el riesgo de sepsis",ok:false,fb:"Incorrecto. La amputación es el último recurso. Antes de amputar hay que valorar: (1) ¿Es el miembro revascularizable? (presión digital 22 mmHg = necesita revascularización); (2) ¿Responde la infección al antibiótico dirigido?; (3) ¿Hay osteomielitis? La amputación precipitada en un paciente de 41 años sin intentar salvar la extremidad es una mala práctica."}
+      ]},
+    {fase:"Plan de revascularización",pregunta:"La presión digital es de 22 mmHg (isquemia crítica). ¿Qué opción de revascularización es más adecuada?",
+      opts:[
+        {t:"No es necesaria la revascularización si el antibiótico controla la infección",ok:false,fb:"Incorrecto. La presión digital de 22 mmHg indica isquemia crítica con flujo insuficiente para la cicatrización (umbral de cicatrización: presión digital >30 mmHg). Sin revascularización, la úlcera no cicatrizará aunque la infección se controle."},
+        {t:"Bypass femoropoplíteo inmediato sin estudio previo de anatomía vascular",ok:false,fb:"Incorrecto. Antes de cualquier revascularización quirúrgica o endovascular se necesita una imagen anatómica precisa (Angio-TC o arteriografía) para planificar la técnica. Los troncos distales están muy calcificados en este paciente y hay que ver la anatomía disponible."},
+        {t:"Angio-TC para planificación + revascularización endovascular (angioplastia de troncos distales con balón de pequeño diámetro)",ok:true,fb:"CORRECTO. El Angio-TC permite ver la anatomía del árbol arterial infrapoplíteo. En el pie diabético, la afectación es predominantemente distal (troncos infrapoplíteos: tibiales, peronea). La angioplastia con balón de pequeño diámetro (2-3 mm) de los troncos distales es la técnica de elección por ser mínimamente invasiva y tener buenos resultados en estos pacientes."},
+        {t:"Amputación transtibial y prótesis funcional como solución definitiva eficiente",ok:false,fb:"Incorrecto en este contexto. La amputación en un paciente de 41 años sin intentar revascularización es prematura. Los resultados de la revascularización distal en pie diabético han mejorado mucho con las técnicas endovasculares modernas. La preservación de la extremidad debe intentarse siempre antes de la amputación."}
+      ]}
+  ],
+  dx:"Pie diabético neuroisquémico Wagner 3. Tratamiento: cultivo → ATB dirigida (ciprofloxacino) + revascularización endovascular (PTA de troncos distales) + descarga + desbridamiento + control glucémico. Equipo multidisciplinar.",
+  mirpearl:"TRIPLE TRAMPA del pie diabético: (1) ITB >1,3 en DM = no interpretable → usar presión digital; (2) La úlcera indolora NO es tranquilizadora → es neuropatía; (3) Cultivo ANTES del antibiótico, siempre."
+},
+{n:3,nivel:"Avanzado MIR",col:"#FEE2E2",tc:"#7F1D1D",ibg:"#FECACA",tag:"Disección aórtica",ico:"🔴",
+  title:"Disección aórtica tipo A: el diagnóstico diferencial que no puedes fallar",sub:"Varón, 52 años · HTA mal controlada · Nivel avanzado MIR",
+  pres:"Varón de 52 años, hipertenso mal controlado, sin otros antecedentes. Acude a Urgencias por dolor torácico brusco, desgarrador, irradiado a la espalda interescapular, de 1 hora de evolución. Refiere que comenzó mientras hacía un esfuerzo físico moderado.",
+  expl:["TA: 195/100 mmHg brazo derecho vs 145/85 mmHg brazo izquierdo (diferencia >20 mmHg — SIGNO CLAVE)","Auscultación: soplo diastólico en foco aórtico de NUEVA aparición","ECG: ritmo sinusal, sin cambios isquémicos agudos","Rx tórax: ensanchamiento mediastínico","Troponinas: negativas en determinación inicial (pueden ser levemente positivas si hay afectación coronaria)"],
+  fases:[
+    {fase:"Diagnóstico sindrómico",pregunta:"¿Cuál es tu primera sospecha diagnóstica ante este cuadro?",
+      opts:[
+        {t:"Síndrome coronario agudo con elevación del ST (SCACEST)",ok:false,fb:"Incorrecto. El SCACEST produce dolor opresivo (no desgarrador), los cambios en el ECG son clave para el diagnóstico y las troponinas se elevan. El ensanchamiento mediastínico y la DIFERENCIA DE TA ENTRE BRAZOS >20 mmHg no se explican por un SCA. CUIDADO: La disección puede producir troponinas positivas si afecta a las coronarias (especialmente la derecha) — pero en ese caso NUNCA anticoagular sin confirmar el diagnóstico."},
+        {t:"Disección aórtica aguda tipo A de Stanford (emergencia quirúrgica)",ok:true,fb:"CORRECTO. Dolor desgarrador + diferencia de TA >20 mmHg entre brazos + soplo aórtico nuevo + ensanchamiento mediastínico = disección aórtica tipo A hasta que se demuestre lo contrario. La diferencia de TA indica que la disección afecta al origen de la arteria subclavia izquierda, localizándola en la aorta ascendente o cayado. Esto es una EMERGENCIA QUIRÚRGICA ABSOLUTA."},
+        {t:"Disección aórtica tipo B de Stanford (tratamiento médico)",ok:false,fb:"Incorrecto. La diferencia de TA >20 mmHg entre los dos brazos indica afectación de la arteria subclavia izquierda, lo que implica que la disección alcanza la aorta proximal (ascendente o cayado) = tipo A. El tipo B afecta solo la aorta descendente y no produce diferencia de TA entre brazos."},
+        {t:"Tromboembolismo pulmonar masivo",ok:false,fb:"Incorrecto. El TEP masivo produce disnea, hipotensión, taquicardia, SatO2 baja y sobrecarga derecha en el ECG. No produce dolor desgarrador irradiado a la espalda ni diferencia de TA entre brazos ni ensanchamiento mediastínico."}
+      ]},
+    {fase:"Prueba diagnóstica de elección",pregunta:"Ante la sospecha de disección tipo A, ¿cuál es la prueba diagnóstica de elección?",
+      opts:[
+        {t:"Arteriografía aórtica urgente (patrón de referencia)",ok:false,fb:"Incorrecto. La arteriografía fue el patrón histórico, pero hoy el Angio-TC es la prueba de elección por su rapidez, disponibilidad 24h, alta sensibilidad (98-100%) y especificidad (98-99%) y posibilidad de clasificar la disección y ver las ramas afectadas. La arteriografía es más invasiva y lenta."},
+        {t:"Angio-TC urgente de aorta completa (tórax-abdomen-pelvis) con contraste IV",ok:true,fb:"CORRECTO. El Angio-TC de aorta completa es la prueba de elección para la disección aórtica aguda. Es rápida (disponible 24h), permite clasificar el tipo de Stanford, visualizar el flap intimal, identificar las ramas comprometidas y planificar la cirugía. Mientras se prepara la prueba: betabloqueantes IV para reducir la FC y la tensión parietal aórtica."},
+        {t:"Ecocardiografía transtorácica urgente",ok:false,fb:"Parcialmente correcto. La ETT puede mostrar signos de disección (flap en aorta ascendente, insuficiencia aórtica nueva, derrame pericárdico). Pero su sensibilidad para el diagnóstico de disección es solo del 59-85%, claramente inferior al Angio-TC. Es útil como herramienta rápida de cabecera pero no reemplaza al Angio-TC para la planificación quirúrgica."},
+        {t:"RM cardiaca urgente",ok:false,fb:"Incorrecto. Aunque la RM tiene alta sensibilidad para la disección, NO está indicada en la fase aguda por su duración (30-60 minutos) y la dificultad de monitorización del paciente en el entorno del resonador. En la emergencia aórtica, el tiempo es vida."}
+      ]},
+    {fase:"Tratamiento definitivo",pregunta:"El Angio-TC confirma disección tipo A. ¿Cuál es el tratamiento?",
+      opts:[
+        {t:"Tratamiento médico intensivo con betabloqueantes IV (labetalol) en UCI + anticoagulación",ok:false,fb:"Incorrecto. El tratamiento médico aislado es para la disección tipo B NO COMPLICADA. La tipo A tiene mortalidad del 1-2% POR HORA sin cirugía (50% a las 24h sin operar). Además la anticoagulación está CONTRAINDICADA en tipo A (riesgo de hemopericardio y taponamiento cardíaco)."},
+        {t:"TEVAR (endovascular torácico) urgente",ok:false,fb:"Incorrecto. El TEVAR es para la disección tipo B complicada (afectación de ramas, malperfusión, hematoma en expansión). No puede tratar la aorta ascendente. El acceso endovascular no llega a la aorta ascendente con seguridad."},
+        {t:"Cirugía urgente de reemplazo de aorta ascendente con CEC + tratamiento médico puente",ok:true,fb:"CORRECTO. Disección tipo A = cirugía urgente de reemplazo de aorta ascendente con circulación extracorpórea. Mortalidad quirúrgica: 15-30% (vs. >50% con tratamiento médico solo a las 24h). Tratamiento puente mientras se organiza la cirugía: betabloqueantes IV (labetalol, esmolol) para reducir FC <60 lpm y TA sistólica 100-120 mmHg. Analgesia. NO anticoagular."},
+        {t:"EVAR de emergencia + anticoagulación para prevenir extensión",ok:false,fb:"Incorrecto. El EVAR es para el aneurisma de aorta ABDOMINAL, no para la disección aórtica. Además, la anticoagulación está contraindicada en la disección tipo A."}
+      ]}
+  ],
+  dx:"Disección aórtica tipo A de Stanford. Emergencia quirúrgica absoluta. Tratamiento: betabloqueantes IV + Angio-TC urgente + cirugía de reemplazo de aorta ascendente con CEC.",
+  mirpearl:"LA TRAMPA DEL EXAMEN: Si el dolor de la disección tipo A afecta a la coronaria derecha, pueden aparecer troponinas positivas y cambios en el ECG inferior → puede confundirse con SCA. Nunca trombolizar ni anticoagular sin Angio-TC confirmatorio. La diferencia de TA entre brazos es la clave diferencial."
+}
+];
+
+function infoSrc(k){ return 'img/info/'+k+'.jpg'; }
+function slideSrc(k,p){ return 'img/slides/'+k+'/'+p+'.jpg'; }
+
+const slidesData=[
+  {key:"t1",ico:"🫀",bg:"#DBEAFE",tl:"Generalidades",sub:"Ateromatosis · Buerger · AAA",tag:"Arterial",tc:"#1E3A5F",tbg:"#BFDBFE"},
+  {key:"t2",ico:"⚡",bg:"#FEE2E2",tl:"Isquemia aguda",sub:"6P · Rutherford · Fogarty",tag:"Urgencia",tc:"#7F1D1D",tbg:"#FECACA"},
+  {key:"t3",ico:"🧠",bg:"#DCFCE7",tl:"Troncos supraaórticos",sub:"Ictus · Carótida · AIT",tag:"Neuro",tc:"#14532D",tbg:"#BBF7D0"},
+  {key:"t4",ico:"🦵",bg:"#FEF3C7",tl:"Isquemia crónica EEII",sub:"Fontaine · ITB · Bypass",tag:"Arterial",tc:"#78350F",tbg:"#FDE68A"},
+  {key:"t5",ico:"🩺",bg:"#EDE9FE",tl:"Insuf. venosa crónica",sub:"CEAP · Varices · SPT",tag:"Venoso",tc:"#3730A3",tbg:"#C4B5FD"},
+  {key:"t6",ico:"🩸",bg:"#FCE7F3",tl:"Enf. tromboembólica",sub:"TVP · TEP · HBPM",tag:"Urgencia",tc:"#831843",tbg:"#FBCFE8"},
+  {key:"t7",ico:"🦶",bg:"#D1FAE5",tl:"Linfáticos y pie DM",sub:"Wagner · Linfedema",tag:"DM",tc:"#064E3B",tbg:"#6EE7B7"},
+  {key:"t8",ico:"🔴",bg:"#FEE2E2",tl:"Patología de la aorta",sub:"AAA · Disección · EVAR",tag:"Aorta",tc:"#7F1D1D",tbg:"#FECACA"},
+  {key:"t9",ico:"🚑",bg:"#F1F5F9",tl:"Traumatismos vasc.",sub:"Pseudoaneurisma · FAV",tag:"Trauma",tc:"#374151",tbg:"#CBD5E1"},
+  {key:"t10",ico:"🔬",bg:"#FEF3C7",tl:"Angiodisplasias",sub:"Raynaud · MAV",tag:"Funcional",tc:"#78350F",tbg:"#FDE68A"},
+  {key:"t11",ico:"🫁",bg:"#DBEAFE",tl:"Arterias viscerales",sub:"Isquemia mesentérica",tag:"Arterial",tc:"#1E3A5F",tbg:"#BFDBFE"},
+  {key:"s1",ico:"👂",bg:"#DCFCE7",tl:"Exploración vascular",sub:"Doppler · ITB · Pulsos",tag:"Seminario",tc:"#14532D",tbg:"#BBF7D0"},
+  {key:"s2",ico:"📋",bg:"#EDE9FE",tl:"Diagnóstico del edema",sub:"DD · Exploración",tag:"Seminario",tc:"#3730A3",tbg:"#C4B5FD"},
+  {key:"s3",ico:"🦵",bg:"#D1FAE5",tl:"Úlceras en EEII",sub:"Venosas · Arteriales",tag:"Seminario",tc:"#064E3B",tbg:"#6EE7B7"},
+  {key:"s4",ico:"🏥",bg:"#FEE2E2",tl:"Casos clínicos",sub:"Razonamiento dx",tag:"Seminario",tc:"#7F1D1D",tbg:"#FECACA"}
+];
+
+const infoData=[
+  {key:"i1",ico:"🫀",bg:"#DBEAFE",tl:"Generalidades vasculares",desc:"Aterosclerosis, Buerger, AAA y FRCV"},
+  {key:"i2",ico:"⚡",bg:"#FEE2E2",tl:"Isquemia aguda",desc:"6P, Rutherford y tratamiento urgente"},
+  {key:"i3",ico:"🧠",bg:"#DCFCE7",tl:"Patología carotídea",desc:"Ictus, AIT y diagnóstico"},
+  {key:"i4",ico:"🦵",bg:"#FEF3C7",tl:"Isquemia crónica EEII",desc:"Fontaine I-IV e ITB"},
+  {key:"i5",ico:"🩺",bg:"#EDE9FE",tl:"Insuf. venosa crónica",desc:"CEAP C0-C6 y tratamiento"},
+  {key:"i6",ico:"🩸",bg:"#FCE7F3",tl:"ETEV",desc:"TVP, TEP, Wells y anticoagulación"},
+  {key:"i8",ico:"🔴",bg:"#FEE2E2",tl:"Patología aórtica",desc:"AAA, disección y EVAR"},
+  {key:"i9",ico:"🚑",bg:"#F1F5F9",tl:"Traumatismos vasculares",desc:"Lesiones y tratamiento urgente"},
+  {key:"i10",ico:"🔬",bg:"#FEF3C7",tl:"Angiodisplasias",desc:"Raynaud, eritromelalgia, MAV"},
+  {key:"s1",ico:"👂",bg:"#DCFCE7",tl:"Exploración vascular",desc:"Seminario 1 — resumen visual"},
+  {key:"s2",ico:"📋",bg:"#EDE9FE",tl:"Diagnóstico del edema",desc:"Seminario 2 — resumen visual"},
+  {key:"s3",ico:"🦵",bg:"#D1FAE5",tl:"Úlceras EEII",desc:"Seminario 3 — resumen visual"},
+  {key:"s4",ico:"🏥",bg:"#FEE2E2",tl:"Casos clínicos",desc:"Seminario 4 — resumen visual"}
+];
+
+// ─── STATE ───
+let curQ=0,qFilter='todos',fQ=[...QUESTIONS],answered={},scores={};
+let vKey='',vPage=1;
+let rMode='flash',flashIdx=0;
+
+// ─── NAV ───
+function goSec(id,btn){
+  document.querySelectorAll('.sec').forEach(s=>s.classList.remove('on'));
+  document.querySelectorAll('.nb').forEach(b=>b.classList.remove('on'));
+  document.getElementById(id).classList.add('on');
+  if(btn) btn.classList.add('on');
+  window.scrollTo(0,0);
+  if(id==='slides'&&!document.getElementById('sgrid').children.length) buildSlides();
+  if(id==='info'&&!document.getElementById('igrid').children.length) buildInfo();
+  if(id==='test'){buildFilters();renderQ();}
+  if(id==='casos'&&!document.getElementById('clist').children.length) buildCasos();
+  if(id==='repaso') renderRepaso();
+  if(id==='progreso') renderProgreso();
+}
+
+// ─── DASHBOARD ───
+function updateDash(){
+  const total=Object.keys(scores).length;
+  const ok=Object.values(scores).filter(Boolean).length;
+  document.getElementById('d-total').textContent=total;
+  document.getElementById('d-pct').textContent=total?Math.round(ok/total*100)+'%':'—';
+  const tf={};
+  Object.entries(scores).forEach(([id,isOk])=>{
+    if(!isOk){const q=QUESTIONS.find(x=>x.id==id);if(q)tf[q.tl]=(tf[q.tl]||0)+1;}
+  });
+  const worst=Object.entries(tf).sort((a,b)=>b[1]-a[1])[0];
+  document.getElementById('d-weak').textContent=worst?worst[0]:'—';
+}
+
+// ─── TEORÍA ───
+function selT(el,key){
+  document.querySelectorAll('.sbi').forEach(e=>e.classList.remove('on'));
+  el.classList.add('on');
+  renderTopic(key);
+}
+function renderTopic(key){
+  const t=TOPICS[key]; if(!t)return;
+  const p=document.getElementById('tp');
+  let h='<div class="topic-head"><h2>'+t.title+'</h2><p>'+t.sub+'</p></div>';
+  t.cards.forEach(function(c){
+    h+='<div class="tcard"><div class="tcard-hdr"><span class="tcard-dot"></span><h3>'+c.h+'</h3></div><div class="tcard-body">';
+    h+='<p>'+c.b+'</p>';
+    if(c.table){
+      var tbl=c.table;
+      h+='<table style="width:100%;border-collapse:collapse;font-size:12px;margin-top:8px">';
+      h+='<tr>';
+      tbl.headers.forEach(function(hd){ h+='<th style="background:#DBEAFE;padding:6px;border:1px solid #BFDBFE;font-weight:700;text-align:left">'+hd+'</th>'; });
+      h+='</tr>';
+      tbl.rows.forEach(function(row,ri){
+        var bg=tbl.rowColors&&tbl.rowColors[ri]?tbl.rowColors[ri]:'#fff';
+        h+='<tr>';
+        row.forEach(function(cell,ci){
+          h+='<td style="padding:6px;border:1px solid #E8EAF0;background:'+bg+(ci===0?';font-weight:700':'')+'">'+cell+'</td>';
+        });
+        h+='</tr>';
+      });
+      h+='</table>';
+    }
+    if(c.mir) h+='<div class="mir-pearl"><span class="mir-pearl-icon">💎</span><div><div class="mir-pearl-title">Perla MIR</div><div class="mir-pearl-text">'+c.mir+'</div></div></div>';
+    if(c.algo&&c.algo.length){
+      h+='<div class="algo-box"><div class="algo-title">🔄 Algoritmo clínico</div>';
+      c.algo.forEach(function(s,i){ h+='<div class="algo-step"><span class="algo-num">'+(i+1)+'</span><span class="algo-step-text">'+s+'</span></div>'; });
+      h+='</div>';
+    }
+    if(c.tags&&c.tags.length){
+      h+='<div class="tags">';
+      c.tags.forEach(function(tg){var p2=tg.split(':');h+='<span class="tag '+p2[0]+'">'+p2[1]+'</span>';});
+      h+='</div>';
+    }
+    h+='</div></div>';
+  });
+  p.innerHTML=h;
+}
+
+// ─── DIAPOSITIVAS ───
+function buildSlides(){
+  var html='';
+  slidesData.forEach(function(s,i){
+    html+='<div class="sc" onclick="openV(\''+s.key+'\',\''+s.tl+'\')">'+
+      '<div class="sthumb" id="st-'+i+'" style="background:'+s.bg+'">'+
+        '<div class="sthumb-placeholder">'+
+          '<span style="font-size:26px">'+s.ico+'</span>'+
+          '<span style="font-size:10px;font-weight:700;color:rgba(0,0,0,.4)">'+(PAGES[s.key]||'?')+' diap.</span>'+
+        '</div>'+
+        '<span class="stnum">'+s.key.toUpperCase()+'</span>'+
+        '<span class="stag" style="background:'+s.tbg+';color:'+s.tc+'">'+s.tag+'</span>'+
+      '</div>'+
+      '<div class="slabel"><p>'+s.tl+'</p><span>'+s.sub+'</span></div>'+
+    '</div>';
+  });
+  document.getElementById('sgrid').innerHTML=html;
+
+  var obs=new IntersectionObserver(function(entries){
+    entries.forEach(function(entry){
+      if(!entry.isIntersecting)return;
+      var el=entry.target;
+      var key=el.dataset.key;
+      var img=new Image();
+      img.onload=function(){
+        var ph=el.querySelector('.sthumb-placeholder');
+        if(ph) ph.style.opacity='0';
+        img.style.cssText='position:absolute;inset:0;width:100%;height:100%;object-fit:cover';
+        el.style.position='relative';
+        el.insertBefore(img,el.querySelector('.stnum'));
+      };
+      img.src=slideSrc(key,1);
+      obs.unobserve(el);
+    });
+  },{threshold:0.1});
+
+  document.querySelectorAll('#sgrid .sthumb').forEach(function(el,i){
+    el.dataset.key=slidesData[i].key;
+    obs.observe(el);
+  });
+}
+
+var vDeck=[];
+function openV(key,title){
+  vKey=key; vPage=1;
+  document.getElementById('vtitle').textContent=title;
+  document.getElementById('viewer').classList.add('open');
+  document.body.style.overflow='hidden';
+  loadSlide();
+  buildPills();
+}
+function loadSlide(){
+  var total=PAGES[vKey]||1;
+  document.getElementById('vcnt').textContent=vPage+' / '+total;
+  var body=document.getElementById('vbody');
+  body.innerHTML='<div class="modal-loading">Cargando...</div>';
+  var img=new Image();
+  img.className='modal-img';
+  img.onload=function(){ body.innerHTML=''; body.appendChild(img); updatePills(); };
+  img.onerror=function(){ body.innerHTML='<div class="modal-loading" style="color:#f66">Error al cargar imagen</div>'; };
+  img.src=slideSrc(vKey,vPage);
+}
+function buildPills(){
+  var total=PAGES[vKey]||1;
+  var html='';
+  for(var i=1;i<=total;i++){
+    html+='<div class="vpill'+(i===1?' on':'')+'" id="vp-'+i+'" onclick="jumpSlide('+i+')">'+i+'</div>';
+  }
+  document.getElementById('vstrip').innerHTML=html;
+}
+function updatePills(){
+  document.querySelectorAll('.vpill').forEach(function(p,i){ p.classList.toggle('on',i+1===vPage); });
+  var a=document.getElementById('vp-'+vPage);
+  if(a) a.scrollIntoView({behavior:'smooth',inline:'center',block:'nearest'});
+}
+function jumpSlide(n){ vPage=n; loadSlide(); }
+function sMove(d){
+  var total=PAGES[vKey]||1;
+  vPage=Math.max(1,Math.min(total,vPage+d));
+  loadSlide();
+}
+function closeV(){ document.getElementById('viewer').classList.remove('open'); document.body.style.overflow=''; }
+document.addEventListener('keydown',function(e){
+  if(!document.getElementById('viewer').classList.contains('open'))return;
+  if(e.key==='ArrowRight')sMove(1);
+  if(e.key==='ArrowLeft')sMove(-1);
+  if(e.key==='Escape')closeV();
+});
+
+// ─── INFOGRAFÍAS ───
+function buildInfo(){
+  var html='';
+  infoData.forEach(function(d,i){
+    html+='<div class="ic" onclick="toggleInfo('+i+',\''+d.key+'\')">'+
+      '<div class="ic-top"><div class="ic-ico" style="background:'+d.bg+'">'+d.ico+'</div><h4>'+d.tl+'</h4></div>'+
+      '<p>'+d.desc+'</p>'+
+      '<div class="ic-arr" id="ica-'+i+'">▼ Ver imagen completa</div>'+
+      '<div class="ic-viewer" id="iv-'+i+'"></div>'+
+    '</div>';
+  });
+  document.getElementById('igrid').innerHTML=html;
+}
+function toggleInfo(i,key){
+  var viewer=document.getElementById('iv-'+i);
+  var arr=document.getElementById('ica-'+i);
+  var card=viewer.parentElement;
+  if(viewer.classList.contains('open')){
+    viewer.classList.remove('open');
+    card.classList.remove('expanded');
+    arr.textContent='▼ Ver imagen completa';
+    return;
+  }
+  viewer.classList.add('open');
+  card.classList.add('expanded');
+  arr.textContent='▲ Cerrar imagen';
+  if(viewer.dataset.loaded) return;
+  viewer.innerHTML='<div class="loading-msg" style="padding:20px;text-align:center;color:#888">⏳ Cargando imagen...</div>';
+  var img=new Image();
+  img.onload=function(){
+    viewer.innerHTML='';
+    img.style.cssText='width:100%;display:block;border-radius:8px';
+    viewer.appendChild(img);
+    viewer.dataset.loaded='1';
+  };
+  img.onerror=function(){
+    viewer.innerHTML='<div class="loading-msg" style="padding:16px;text-align:center;color:#c00">❌ Error al cargar imagen</div>';
+  };
+  img.src=infoSrc(key);
+}
+
+// ─── TEST MIR ───
+function buildFilters(){
+  var cats=[{k:'todos',l:'Todos'},{k:'arterial',l:'Arterial'},{k:'venoso',l:'Venoso'},{k:'aorta',l:'Aorta'},{k:'trauma',l:'Traumatismos'},{k:'funcional',l:'Funcional'}];
+  var html='';
+  cats.forEach(function(c){ html+='<button class="fchip'+(qFilter===c.k?' on':'')+'" onclick="setF(\''+c.k+'\',this)">'+c.l+'</button>'; });
+  document.getElementById('filt').innerHTML=html;
+}
+function setF(f,btn){
+  qFilter=f; answered={}; scores={}; curQ=0;
+  fQ=f==='todos'?[...QUESTIONS]:QUESTIONS.filter(function(q){return q.t===f;});
+  document.querySelectorAll('.fchip').forEach(function(b){b.classList.remove('on');});
+  btn.classList.add('on');
+  renderQ();
+}
+function renderQ(){
+  var ok=Object.values(scores).filter(Boolean).length;
+  var total=Object.keys(scores).length;
+  document.getElementById('scb').textContent=ok+' / '+total+' correctas';
+  if(!fQ.length){ document.getElementById('qc').innerHTML='<p style="color:#888;padding:10px 0">No hay preguntas para este filtro.</p>'; return; }
+  var q=fQ[curQ];
+  document.getElementById('pb').style.width=((curQ+1)/fQ.length*100)+'%';
+  document.getElementById('qct').textContent=(curQ+1)+' / '+fQ.length;
+  document.getElementById('bprev').disabled=curQ===0;
+  document.getElementById('bnext').disabled=curQ===fQ.length-1;
+  var L='ABCDE';
+  var stars='★'.repeat(q.lvl)+'☆'.repeat(5-q.lvl);
+  var optsH='';
+  q.opts.forEach(function(o,i){
+    var cls='opt', dis='';
+    if(answered[q.id]!==undefined){ dis='disabled'; if(i===q.c)cls+=' ok'; else if(i===answered[q.id])cls+=' bad'; }
+    optsH+='<button class="'+cls+'" '+dis+' onclick="ansQ('+i+')"><span class="opt-l">'+L[i]+'</span><span>'+o+'</span></button>';
+  });
+  var fbH='';
+  if(answered[q.id]!==undefined){
+    var isOk=answered[q.id]===q.c;
+    fbH='<div class="fb '+(isOk?'fb-ok':'fb-bad')+'"><span class="fi">'+(isOk?'✅':'❌')+'</span><div><strong>'+(isOk?'Correcto.':'Incorrecto.')+'</strong> '+q.exp+(q.mir?'<br><br><strong>💎 Perla MIR:</strong> '+q.mir:'')+'</div></div>';
+  }
+  document.getElementById('qc').innerHTML=
+    '<div class="qtop"><span class="qnum">Pregunta '+(curQ+1)+'/'+fQ.length+'</span><span class="qlvl">'+stars+'</span><span class="qtag">'+q.tl+'</span></div>'+
+    '<p class="qtext">'+q.q+'</p>'+
+    '<div class="opts">'+optsH+'</div>'+fbH;
+}
+function ansQ(i){
+  var q=fQ[curQ]; if(answered[q.id]!==undefined)return;
+  answered[q.id]=i; scores[q.id]=i===q.c;
+  updateDash(); renderQ();
+}
+function mQ(d){ curQ+=d; renderQ(); }
+
+// ─── CASOS CLÍNICOS ───
+function buildCasos(){
+  var html='';
+  CASOS.forEach(function(c,ci){
+    html+='<div class="caso" id="caso-'+ci+'">'+
+      '<div class="caso-hdr" onclick="toggleCaso('+ci+')">'+
+        '<div class="caso-circle" style="background:'+c.col+'">'+c.ico+'</div>'+
+        '<div class="caso-info">'+
+          '<div class="caso-title">'+c.title+'</div>'+
+          '<div class="caso-sub">'+c.sub+'</div>'+
+        '</div>'+
+        '<div class="caso-chips">'+
+          '<span class="cchip" style="background:'+c.col+';color:'+c.tc+'">'+c.tag+'</span>'+
+          '<span class="cchip" style="background:'+c.ibg+';color:'+c.tc+'">'+c.nivel+'</span>'+
+        '</div>'+
+        '<span class="caso-chev">▼</span>'+
+      '</div>'+
+      '<div class="caso-body">'+
+        '<div class="cs"><div class="csl"><span class="csl-dot"></span>Presentación clínica</div><p>'+c.pres+'</p></div>'+
+        '<div class="cs"><div class="csl"><span class="csl-dot"></span>Exploración y pruebas</div><ul>'+c.expl.map(function(e){return '<li>'+e+'</li>';}).join('')+'</ul></div>'+
+        buildFases(c,ci)+
+        '<div class="dx-box" id="dx-'+ci+'" style="display:none">'+
+          '<div class="csl"><span class="csl-dot" style="background:#16A34A"></span>Diagnóstico y plan terapéutico</div>'+
+          '<p>'+c.dx+'</p>'+
+          '<div class="mir-pearl" style="margin-top:12px"><span class="mir-pearl-icon">💎</span><div><div class="mir-pearl-title">Perla MIR del caso</div><div class="mir-pearl-text">'+c.mirpearl+'</div></div></div>'+
+        '</div>'+
+      '</div>'+
+    '</div>';
+  });
+  document.getElementById('clist').innerHTML=html;
+}
+function buildFases(c,ci){
+  var html='';
+  c.fases.forEach(function(f,fi){
+    html+='<div class="cs" id="fase-'+ci+'-'+fi+'"'+(fi>0?' style="display:none"':'')+'>'+
+      '<div class="csl"><span class="csl-dot" style="background:#7C3AED"></span>Fase '+(fi+1)+': '+f.fase+'</div>'+
+      '<div class="cq">'+f.pregunta+'</div>'+
+      '<div class="dopts" id="dopts-'+ci+'-'+fi+'">'+
+        f.opts.map(function(o,oi){
+          return '<button class="dopt" onclick="decidir('+ci+','+fi+','+oi+')"><span class="dopt-l">'+'ABCD'[oi]+'</span><span>'+o.t+'</span></button>';
+        }).join('')+
+      '</div>'+
+      '<div id="dfb-'+ci+'-'+fi+'"></div>'+
+    '</div>';
+  });
+  return html;
+}
+function toggleCaso(ci){ document.getElementById('caso-'+ci).classList.toggle('open'); }
+function decidir(ci,fi,oi){
+  var c=CASOS[ci]; var f=c.fases[fi]; var opt=f.opts[oi];
+  var btns=document.querySelectorAll('#dopts-'+ci+'-'+fi+' .dopt');
+  btns.forEach(function(btn,i){
+    btn.disabled=true;
+    if(f.opts[i].ok) btn.classList.add('dok');
+    else if(i===oi&&!f.opts[i].ok) btn.classList.add('dbad');
+  });
+  var fbEl=document.getElementById('dfb-'+ci+'-'+fi);
+  fbEl.innerHTML='<div class="dfb '+(opt.ok?'ok':'bad')+'"><strong>'+(opt.ok?'✅ Correcto':'❌ Incorrecto')+':</strong> '+opt.fb+'</div>';
+  var nextFi=fi+1;
+  var btn2=document.createElement('button');
+  btn2.className='next-btn';
+  if(nextFi<c.fases.length){
+    btn2.textContent='Siguiente fase →';
+    btn2.onclick=function(){ document.getElementById('fase-'+ci+'-'+nextFi).style.display='block'; btn2.remove(); };
+  } else {
+    btn2.style.background='#16A34A';
+    btn2.textContent='Ver diagnóstico completo →';
+    btn2.onclick=function(){ document.getElementById('dx-'+ci).style.display='block'; btn2.remove(); };
+  }
+  fbEl.appendChild(btn2);
+}
+
+// ─── REPASO ───
+function setR(mode,btn){
+  rMode=mode; flashIdx=0;
+  document.querySelectorAll('.rtab').forEach(function(b){b.classList.remove('on');});
+  btn.classList.add('on');
+  renderRepaso();
+}
+function renderRepaso(){
+  var c=document.getElementById('rcontent');
+  if(rMode==='flash') c.innerHTML=renderFlash();
+  else if(rMode==='perlas') c.innerHTML=renderPerlas();
+  else c.innerHTML=renderErrores();
+}
+function renderFlash(){
+  var f=FLASHCARDS[flashIdx];
+  return '<div class="flash-wrap">'+
+    '<div class="flash-card" id="fc" onclick="this.classList.toggle(\'flip\')">'+
+      '<p class="flash-q">'+f.q+'</p>'+
+      '<p class="flash-hint">🫀 Toca para revelar la respuesta</p>'+
+      '<p class="flash-a">'+f.a+'</p>'+
+    '</div>'+
+    '<div class="flash-nav">'+
+      '<button class="fnbtn" onclick="mFlash(-1)"'+(flashIdx===0?' disabled':'')+'>← Anterior</button>'+
+      '<span class="fcnt">'+(flashIdx+1)+' / '+FLASHCARDS.length+'</span>'+
+      '<button class="fnbtn" onclick="mFlash(1)"'+(flashIdx===FLASHCARDS.length-1?' disabled':'')+'>Siguiente →</button>'+
+    '</div>'+
+  '</div>';
+}
+function mFlash(d){ flashIdx=Math.max(0,Math.min(FLASHCARDS.length-1,flashIdx+d)); renderRepaso(); }
+function renderPerlas(){
+  var h='<div class="perla-grid">';
+  PERLAS.forEach(function(p){ h+='<div class="perla-card"><div class="perla-ico">'+p.ico+'</div><div class="perla-txt">'+p.text+'</div></div>'; });
+  return h+'</div>';
+}
+function renderErrores(){
+  var h='<div class="err-grid">';
+  ERRORES.forEach(function(e){
+    h+='<div class="err-card"><div class="err-cols">'+
+      '<div class="err-col w"><div class="err-lbl">❌ Error frecuente</div><div class="err-txt">'+e.wrong+'</div></div>'+
+      '<div class="err-col r"><div class="err-lbl">✅ Correcto</div><div class="err-txt">'+e.right+'</div></div>'+
+    '</div><div class="err-explain">💡 '+e.explain+'</div></div>';
+  });
+  return h+'</div>';
+}
+
+// ─── PROGRESO ───
+function renderProgreso(){
+  updateDash();
+  var areas=[
+    {label:"Isquemia arterial",t:"arterial",color:"#1565C0"},
+    {label:"Patología aórtica",t:"aorta",color:"#C62828"},
+    {label:"Enfermedad venosa",t:"venoso",color:"#7B1FA2"},
+    {label:"Traumatismos",t:"trauma",color:"#4E342E"},
+    {label:"Func. / Angiodispl.",t:"funcional",color:"#E65100"},
+    {label:"Total general",t:"todos",color:"#0A3A6B"}
+  ];
+  var radarH='';
+  areas.forEach(function(a){
+    var qs=a.t==='todos'?QUESTIONS:QUESTIONS.filter(function(q){return q.t===a.t;});
+    var ans=qs.filter(function(q){return scores[q.id]!==undefined;});
+    var ok2=ans.filter(function(q){return scores[q.id];}).length;
+    var pct=ans.length?Math.round(ok2/ans.length*100):0;
+    radarH+='<div class="radar-row">'+
+      '<span class="radar-lbl">'+a.label+'</span>'+
+      '<div class="radar-bw"><div class="radar-b" style="width:'+(ans.length?pct:0)+'%;background:'+a.color+'"></div></div>'+
+      '<span class="radar-pct">'+(ans.length?pct+'%':'—')+'</span>'+
+    '</div>';
+  });
+  document.getElementById('radar').innerHTML=radarH;
+  var total2=Object.keys(scores).length;
+  var ok3=Object.values(scores).filter(Boolean).length;
+  document.getElementById('stats').innerHTML=
+    '<div style="font-size:13px;color:var(--text2);margin-bottom:6px">Respondidas: <strong>'+total2+'</strong></div>'+
+    '<div style="font-size:13px;color:var(--text2);margin-bottom:6px">Correctas: <strong style="color:#16A34A">'+ok3+'</strong></div>'+
+    '<div style="font-size:13px;color:var(--text2);margin-bottom:6px">Incorrectas: <strong style="color:#DC2626">'+(total2-ok3)+'</strong></div>'+
+    '<div style="font-size:13px;color:var(--text2)">Acierto: <strong>'+(total2?Math.round(ok3/total2*100)+'%':'—')+'</strong></div>';
+  var tf2={};
+  Object.entries(scores).forEach(function(e){ var id=e[0],isOk=e[1]; if(!isOk){var q=QUESTIONS.find(function(x){return x.id==id;}); if(q)tf2[q.tl]=(tf2[q.tl]||0)+1;} });
+  var fallos=Object.entries(tf2).sort(function(a,b){return b[1]-a[1];}).slice(0,5);
+  document.getElementById('fallos').innerHTML=fallos.length
+    ?fallos.map(function(e,i){ return '<div class="fallo"><span class="fallo-rank">'+(i+1)+'</span><span class="fallo-concept">'+e[0]+'</span><span class="fallo-pct">'+e[1]+' fallo'+(e[1]!==1?'s':'')+'</span></div>'; }).join('')
+    :'<p style="font-size:13px;color:var(--text3)">Responde preguntas en el Test MIR para ver tus puntos débiles.</p>';
+  var rec=document.getElementById('rec-txt');
+  if(fallos.length){ rec.innerHTML='Tu área más débil es <strong>'+fallos[0][0]+'</strong> ('+fallos[0][1]+' fallo'+(fallos[0][1]!==1?'s':'')+').'; }
+}
+
+// ─── INIT ───
+renderTopic('t1');
+buildFilters();
+renderQ();
+renderRepaso();
+updateDash();
+
+console.log('FULL JS OK');
+</script>
+</body>
+</html>
